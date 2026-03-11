@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Calisthenics"/>
+<title>Calisthenics Mastery</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;600;700&display=swap');
+:root{
+  --bg:#F4F6F9;--surface:#FFFFFF;--surface2:#EEF1F5;--border:#DDE2EA;
+  --navy:#1A3A5A;--navy2:#2A4F78;--gold:#B8860B;--gold2:#D4A017;
+  --green:#1A6B3A;--red:#8B1A1A;--purple:#4A1A6B;--teal:#0D5454;
+  --text:#1A2332;--text2:#4A5568;--text3:#8A95A3;
+  --badge-bg:#EEF4FF;--badge-text:#2A4F78;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overscroll-behavior:none;height:100dvh;display:flex;flex-direction:column;}
+.os{font-family:'Oswald',system-ui,sans-serif;}
+input,textarea,button,select{font-family:inherit;-webkit-appearance:none;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+#root{display:flex;flex-direction:column;height:100dvh;max-width:800px;margin:0 auto;width:100%;}
+#topbar{background:var(--navy);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding-top:max(10px,env(safe-area-inset-top));}
+#main{flex:1;overflow-y:auto;padding:12px;padding-bottom:calc(68px + env(safe-area-inset-bottom));}
+#navbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:800px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 8px rgba(0,0,0,0.08);}
+.navbtn{flex:1;padding:10px 0;background:transparent;border:none;border-top:2px solid transparent;color:var(--text3);font-size:9px;letter-spacing:1.5px;cursor:pointer;text-align:center;}
+.navbtn.active{color:var(--navy);border-top-color:var(--navy);}
+.navbtn .icon{font-size:15px;display:block;margin-bottom:1px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+.btn{padding:9px 18px;border:none;border-radius:8px;font-family:'Oswald',system-ui;letter-spacing:1.5px;font-size:12px;cursor:pointer;transition:opacity .15s;}
+.btn:active{opacity:.8;}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-gold{background:var(--gold);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2);}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.5px;}
+.badge-navy{background:#EEF4FF;color:var(--navy);}
+.badge-gold{background:#FFF8E6;color:var(--gold);}
+.badge-green{background:#EDFAF3;color:var(--green);}
+.badge-red{background:#FFF0F0;color:var(--red);}
+.badge-purple{background:#F5EEFF;color:var(--purple);}
+/* Exercise rows */
+.exrow{border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--surface);overflow:hidden;transition:border-color .2s;}
+.exrow.done{border-color:#AADDC0;background:#F5FFF9;}
+.exrow-header{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;}
+.exrow-body{padding:10px 13px 12px;border-top:1px solid var(--border);background:var(--surface2);}
+.exrow.done .exrow-body{background:#F0FDF6;}
+.check{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:transparent;transition:all .2s;}
+.check.done{border-color:var(--green);background:var(--green);color:#fff;}
+/* Set logging rows (Boostcamp style) */
+.set-row{display:grid;grid-template-columns:32px 1fr 1fr 80px;gap:6px;align-items:center;margin-bottom:6px;}
+.set-num{font-size:11px;font-weight:700;color:var(--text3);text-align:center;}
+.set-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:14px;font-weight:600;background:var(--surface);color:var(--text);text-align:center;}
+.set-input:focus{outline:none;border-color:var(--navy);background:#EEF4FF;}
+.set-input.completed{border-color:#AADDC0;background:#F0FDF6;}
+.set-complete-btn{padding:8px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text3);font-size:13px;cursor:pointer;text-align:center;transition:all .2s;}
+.set-complete-btn.done{background:var(--green);border-color:var(--green);color:#fff;}
+.set-header{display:grid;grid-template-columns:32px 1fr 1fr 80px;gap:6px;margin-bottom:4px;}
+.set-header-label{font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.5px;text-align:center;}
+/* Skill track */
+.skill-bar{height:8px;border-radius:4px;background:var(--surface2);overflow:hidden;margin:6px 0;}
+.skill-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--navy),var(--gold));transition:width .4s ease;}
+/* Timer */
+.timer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:2000;padding:16px;backdrop-filter:blur(4px);}
+.timer-box{background:var(--surface);border-radius:16px;padding:24px;width:100%;max-width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;justify-content:center;z-index:1500;padding:0;}
+.modal-sheet{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:600px;padding:20px;max-height:90vh;overflow-y:auto;box-shadow:0 -4px 24px rgba(0,0,0,0.15);}
+.modal-center{background:var(--surface);border-radius:16px;padding:22px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,0.15);}
+.modal-overlay-center{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1500;padding:16px;}
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:3000;white-space:nowrap;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+/* Misc */
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--text3);margin:16px 0 8px;text-transform:uppercase;}
+.divider{height:1px;background:var(--border);margin:12px 0;}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+input[type=range]{width:100%;accent-color:var(--navy);}
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="topbar">
+    <div class="os" style="font-size:16px;letter-spacing:3px;color:#fff;font-weight:700;">CALISTHENICS</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span id="topinfo" class="os" style="font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:1px;"></span>
+      <button onclick="openTimer()" style="padding:6px 10px;background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:8px;font-size:12px;cursor:pointer;">⏱</button>
+    </div>
+  </div>
+  <div id="main"></div>
+  <div id="navbar">
+    <button class="navbtn active" id="nav-today" onclick="setView('today')"><span class="icon">▶</span>TODAY</button>
+    <button class="navbtn" id="nav-skills" onclick="setView('skills')"><span class="icon">◈</span>SKILLS</button>
+    <button class="navbtn" id="nav-pr" onclick="setView('pr')"><span class="icon">↑</span>PRs</button>
+    <button class="navbtn" id="nav-summary" onclick="setView('summary')"><span class="icon">▦</span>WEEK</button>
+    <button class="navbtn" id="nav-more" onclick="setView('more')"><span class="icon">⚙</span>MORE</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════════════════════════════════
+const SK='ucm_v1';
+function save(d){try{localStorage.setItem(SK,JSON.stringify(d));}catch(e){}}
+function load(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):null;}catch(e){return null;}}
+
+// ════════════════════════════════════════════════════════════════
+// PROGRAM DATA
+// ════════════════════════════════════════════════════════════════
+const PROGRAM_START_STR = '2026-03-10'; // Day 1 = Push A
+const DAY_ORDER = ['push_a','pull_a','legs_a','core_str','push_b','pull_b','legs_b'];
+
+const LEVEL_NAMES = ['Beginner','Foundation','Intermediate','Advanced','Elite','Mastery'];
+const LEVEL_COLORS = ['#2E7D32','#1565C0','#F57F17','#AD1457','#6A1B9A','#B71C1C'];
+
+// Skill tracks with progressions
+const SKILLS = {
+  planche:{name:'Planche',icon:'🤸',levels:[
+    {name:'Planche Lean',standard:'3×30s hold',desc:'Shoulders past wrists, straight body, pointed toes',yt:'https://www.youtube.com/results?search_query=planche+lean+tutorial'},
+    {name:'Tuck Planche',standard:'3×20s hold',desc:'Knees to chest, hips up, arms straight',yt:'https://www.youtube.com/results?search_query=tuck+planche+tutorial'},
+    {name:'Adv Tuck Planche',standard:'3×20s hold',desc:'Back parallel to floor, knees tucked',yt:'https://www.youtube.com/results?search_query=advanced+tuck+planche+tutorial'},
+    {name:'Straddle Planche',standard:'3×15s hold',desc:'Legs out to sides, body parallel',yt:'https://www.youtube.com/results?search_query=straddle+planche+tutorial'},
+    {name:'Full Planche',standard:'3×10s hold',desc:'Legs together, body perfectly parallel',yt:'https://www.youtube.com/results?search_query=full+planche+tutorial'},
+    {name:'Planche Push-Up',standard:'3×5 reps',desc:'Full planche, lower and press',yt:'https://www.youtube.com/results?search_query=planche+push+up+tutorial'},
+  ]},
+  front_lever:{name:'Front Lever',icon:'🏋️',levels:[
+    {name:'Tuck Front Lever',standard:'3×20s hold',desc:'Knees to chest, hips up, arms straight',yt:'https://www.youtube.com/results?search_query=tuck+front+lever+tutorial'},
+    {name:'Adv Tuck FL',standard:'3×20s hold',desc:'Back parallel, knees still tucked',yt:'https://www.youtube.com/results?search_query=advanced+tuck+front+lever'},
+    {name:'One-Leg FL',standard:'3×15s each',desc:'One leg extended, one tucked',yt:'https://www.youtube.com/results?search_query=one+leg+front+lever+tutorial'},
+    {name:'Straddle FL',standard:'3×15s hold',desc:'Both legs out to sides',yt:'https://www.youtube.com/results?search_query=straddle+front+lever+tutorial'},
+    {name:'Full Front Lever',standard:'3×10s hold',desc:'Legs together, arms straight, horizontal',yt:'https://www.youtube.com/results?search_query=full+front+lever+tutorial'},
+    {name:'FL Pull-Up',standard:'3×5 reps',desc:'Pull to bar from full front lever',yt:'https://www.youtube.com/results?search_query=front+lever+pull+up+tutorial'},
+  ]},
+  muscle_up:{name:'Muscle-Up',icon:'💪',levels:[
+    {name:'Chest-to-Bar Pull-Up',standard:'3×5 reps',desc:'Pull until chest touches bar',yt:'https://www.youtube.com/results?search_query=chest+to+bar+pull+up+tutorial'},
+    {name:'MU Negative (ring)',standard:'3×5 reps',desc:'Jump to top, lower slowly 5-10s',yt:'https://www.youtube.com/results?search_query=muscle+up+negative+tutorial+rings'},
+    {name:'Kipping Ring MU',standard:'3×5 reps',desc:'Hip drive for momentum',yt:'https://www.youtube.com/results?search_query=kipping+ring+muscle+up+tutorial'},
+    {name:'Strict Ring MU',standard:'3×3 reps',desc:'No kip, pure strength',yt:'https://www.youtube.com/results?search_query=strict+ring+muscle+up+tutorial'},
+    {name:'L-Sit MU',standard:'3×3 reps',desc:'L-sit position throughout',yt:'https://www.youtube.com/results?search_query=l+sit+muscle+up+tutorial'},
+    {name:'Weighted MU',standard:'3×3 +10lbs',desc:'Add load via belt',yt:'https://www.youtube.com/results?search_query=weighted+muscle+up+tutorial'},
+  ]},
+  handstand:{name:'Handstand',icon:'🙌',levels:[
+    {name:'Wall HS (chest)',standard:'3×60s hold',desc:'Chest faces wall, straight body',yt:'https://www.youtube.com/results?search_query=chest+to+wall+handstand+tutorial'},
+    {name:'Kick-Up Practice',standard:'10 min practice',desc:'Consistent kick-up, log best hold',yt:'https://www.youtube.com/results?search_query=handstand+kick+up+tutorial'},
+    {name:'Freestanding HS',standard:'3×15s hold',desc:'Balance on fingertips',yt:'https://www.youtube.com/results?search_query=freestanding+handstand+balance+tutorial'},
+    {name:'Handstand Walk',standard:'10 min practice',desc:'Log distance each session',yt:'https://www.youtube.com/results?search_query=handstand+walking+tutorial'},
+    {name:'Straddle Press to HS',standard:'3×3 reps',desc:'From straddle, press up without kick',yt:'https://www.youtube.com/results?search_query=straddle+press+handstand+tutorial'},
+    {name:'Straight Press to HS',standard:'3×3 reps',desc:'Legs together from standing',yt:'https://www.youtube.com/results?search_query=straight+press+handstand+tutorial'},
+  ]},
+  hspu:{name:'HSPU',icon:'🤜',levels:[
+    {name:'Pike Push-Up',standard:'3×10 reps',desc:'Inverted V, lower head to floor',yt:'https://www.youtube.com/results?search_query=pike+push+up+tutorial+HSPU'},
+    {name:'Elevated Pike PU',standard:'3×10 reps',desc:'Feet on box, more vertical',yt:'https://www.youtube.com/results?search_query=elevated+pike+push+up+tutorial'},
+    {name:'Wall HSPU (kipping)',standard:'3×5 reps',desc:'Against wall, minimal kip',yt:'https://www.youtube.com/results?search_query=wall+handstand+push+up+kipping'},
+    {name:'Strict Wall HSPU',standard:'3×5 reps',desc:'No kip, full ROM',yt:'https://www.youtube.com/results?search_query=strict+handstand+push+up+tutorial'},
+    {name:'Freestanding HSPU',standard:'3×3 reps',desc:'Away from wall',yt:'https://www.youtube.com/results?search_query=freestanding+handstand+push+up'},
+    {name:'Deficit HSPU',standard:'3×5 reps',desc:'Hands on parallettes, full head ROM',yt:'https://www.youtube.com/results?search_query=deficit+handstand+push+up+parallettes'},
+  ]},
+  back_lever:{name:'Back Lever',icon:'🔙',levels:[
+    {name:'Skin the Cat',standard:'3×5 reps',desc:'Rotate backward through rings',yt:'https://www.youtube.com/results?search_query=skin+the+cat+rings+tutorial'},
+    {name:'Tuck Back Lever',standard:'3×20s hold',desc:'Tuck position facing down',yt:'https://www.youtube.com/results?search_query=tuck+back+lever+tutorial'},
+    {name:'Adv Tuck BL',standard:'3×20s hold',desc:'Back parallel, knees tucked',yt:'https://www.youtube.com/results?search_query=advanced+tuck+back+lever'},
+    {name:'Straddle BL',standard:'3×15s hold',desc:'Legs out to sides',yt:'https://www.youtube.com/results?search_query=straddle+back+lever+tutorial'},
+    {name:'Full Back Lever',standard:'3×15s hold',desc:'Horizontal, arms straight',yt:'https://www.youtube.com/results?search_query=full+back+lever+tutorial'},
+    {name:'BL Lift Out',standard:'3×5 reps',desc:'Dynamic lift from back lever',yt:'https://www.youtube.com/results?search_query=back+lever+lift+out+tutorial'},
+  ]},
+  iron_cross:{name:'Iron Cross',icon:'✚',levels:[
+    {name:'Ring Support Hold',standard:'3×30s hold',desc:'Locked support, rings turned out',yt:'https://www.youtube.com/results?search_query=ring+support+hold+external+rotation'},
+    {name:'Ring Fly (band)',standard:'3×10 reps',desc:'Press rings out with band assist',yt:'https://www.youtube.com/results?search_query=ring+fly+band+assisted+iron+cross'},
+    {name:'Half Cross (90°)',standard:'3×10s hold',desc:'Arms at 90° out to sides',yt:'https://www.youtube.com/results?search_query=iron+cross+progression+half+cross'},
+    {name:'Assisted Cross (band)',standard:'3×15s hold',desc:'Full position with band support',yt:'https://www.youtube.com/results?search_query=iron+cross+band+assisted+tutorial'},
+    {name:'Full Iron Cross',standard:'5×10s hold',desc:'Unassisted full cross',yt:'https://www.youtube.com/results?search_query=iron+cross+gymnastics+rings+tutorial'},
+    {name:'Cross Press Out',standard:'3×3 reps',desc:'Dynamic movement through cross',yt:'https://www.youtube.com/results?search_query=iron+cross+press+out+rings'},
+  ]},
+  lsit_manna:{name:'L-Sit / Manna',icon:'🧘',levels:[
+    {name:'Tuck L-Sit',standard:'3×20s hold',desc:'Knees tucked, hips off floor',yt:'https://www.youtube.com/results?search_query=tuck+l+sit+tutorial+parallettes'},
+    {name:'Full L-Sit',standard:'3×20s hold',desc:'Legs straight, parallel to floor',yt:'https://www.youtube.com/results?search_query=full+l+sit+tutorial'},
+    {name:'L-Sit on Rings',standard:'3×20s hold',desc:'Same on rings, more stability demand',yt:'https://www.youtube.com/results?search_query=l+sit+rings+tutorial'},
+    {name:'V-Sit',standard:'3×15s hold',desc:'Legs above horizontal',yt:'https://www.youtube.com/results?search_query=v+sit+calisthenics+tutorial'},
+    {name:'Manna Progression',standard:'3×10s hold',desc:'Hips above shoulder level',yt:'https://www.youtube.com/results?search_query=manna+progression+calisthenics'},
+    {name:'Full Manna',standard:'3×10s hold',desc:'Legs vertical, arms supporting',yt:'https://www.youtube.com/results?search_query=full+manna+tutorial+calisthenics'},
+  ]},
+  pistol:{name:'Pistol Squat',icon:'🦵',levels:[
+    {name:'Assisted Pistol (ring)',standard:'3×8 each',desc:'Hold ring for balance, full depth',yt:'https://www.youtube.com/results?search_query=assisted+pistol+squat+ring+tutorial'},
+    {name:'Box Pistol Squat',standard:'3×6 each',desc:'Lower onto box at knee height',yt:'https://www.youtube.com/results?search_query=box+pistol+squat+tutorial'},
+    {name:'Full Pistol Squat',standard:'3×6 each',desc:'Freestanding, full depth',yt:'https://www.youtube.com/results?search_query=pistol+squat+tutorial+form'},
+    {name:'Shrimp Squat',standard:'3×5 each',desc:'Rear foot held, knee to floor',yt:'https://www.youtube.com/results?search_query=shrimp+squat+tutorial+progression'},
+    {name:'Weighted Pistol',standard:'3×5 each +20lbs',desc:'Hold KB in goblet position',yt:'https://www.youtube.com/results?search_query=weighted+pistol+squat+tutorial'},
+    {name:'Dragon Squat',standard:'3×5 each',desc:'Rear leg sweeps behind cross-body',yt:'https://www.youtube.com/results?search_query=dragon+squat+tutorial+calisthenics'},
+  ]},
+  nordic:{name:'Nordic Curl',icon:'🦵',levels:[
+    {name:'Glute-Ham Bridge',standard:'3×15 reps',desc:'Feet anchored, drive hips up',yt:'https://www.youtube.com/results?search_query=glute+ham+bridge+tutorial'},
+    {name:'Nordic Eccentric',standard:'3×5 reps',desc:'Lower as slowly as possible 5-8s',yt:'https://www.youtube.com/results?search_query=nordic+curl+eccentric+tutorial'},
+    {name:'Nordic (asst concentric)',standard:'3×5 reps',desc:'Slow eccentric, band assist up',yt:'https://www.youtube.com/results?search_query=nordic+curl+assisted+concentric'},
+    {name:'Full Nordic Curl',standard:'3×5 reps',desc:'Full eccentric and concentric',yt:'https://www.youtube.com/results?search_query=full+nordic+curl+tutorial'},
+    {name:'Weighted Nordic',standard:'3×5 reps +weight',desc:'Hold plate or wear vest',yt:'https://www.youtube.com/results?search_query=weighted+nordic+curl+tutorial'},
+    {name:'Single-Leg Nordic',standard:'3×3 each',desc:'One leg only',yt:'https://www.youtube.com/results?search_query=single+leg+nordic+curl+tutorial'},
+  ]},
+  jefferson:{name:'Jefferson Curl',icon:'🏋️',levels:[
+    {name:'Jefferson Curl (BW)',standard:'3×8 reps',desc:'Roll down vertebra by vertebra, zero load',yt:'https://www.youtube.com/results?search_query=jefferson+curl+tutorial+technique'},
+    {name:'Jefferson Curl (5-15lbs)',standard:'3×6 reps',desc:'Minimal weight only',yt:'https://www.youtube.com/results?search_query=jefferson+curl+loaded+progression'},
+    {name:'Jefferson Curl (moderate)',standard:'3×5 reps',desc:'20-30% bodyweight',yt:'https://www.youtube.com/results?search_query=jefferson+curl+loaded+flexibility'},
+    {name:'Jefferson Curl (heavy)',standard:'3×5 reps',desc:'40-50% bodyweight',yt:'https://www.youtube.com/results?search_query=jefferson+curl+heavy+technique'},
+    {name:'Stiff-Leg Jefferson',standard:'3×5 reps',desc:'Straight legs throughout',yt:'https://www.youtube.com/results?search_query=stiff+leg+jefferson+curl+tutorial'},
+    {name:'Jefferson Mastery',standard:'3×5 reps heavy',desc:'Full loaded spinal flexibility',yt:'https://www.youtube.com/results?search_query=jefferson+curl+mastery+mobility'},
+  ]},
+  bridge:{name:'Bridge',icon:'🌉',levels:[
+    {name:'Hip Thrust (weighted)',standard:'3×15 reps',desc:'Shoulder-blade on bench, add KB',yt:'https://www.youtube.com/results?search_query=hip+thrust+tutorial+technique'},
+    {name:'Back Bridge (passive)',standard:'3×30s hold',desc:'Push up from floor, hold',yt:'https://www.youtube.com/results?search_query=back+bridge+tutorial+gymnastics'},
+    {name:'Bridge Push-Ups',standard:'3×10 reps',desc:'Lower and press from bridge',yt:'https://www.youtube.com/results?search_query=bridge+push+up+tutorial'},
+    {name:"Wrestler's Bridge",standard:'3×20s hold',desc:'Balanced on crown of head',yt:'https://www.youtube.com/results?search_query=wrestler+bridge+tutorial+neck'},
+    {name:'Stand-to-Bridge',standard:'3×5 reps',desc:'Standing, reach back to floor',yt:'https://www.youtube.com/results?search_query=stand+to+bridge+tutorial+gymnastics'},
+    {name:'One-Arm Bridge',standard:'3×5 each',desc:'One arm removed',yt:'https://www.youtube.com/results?search_query=one+arm+bridge+tutorial'},
+  ]},
+  one_arm_pull:{name:'One-Arm Pull-Up',icon:'💪',levels:[
+    {name:'Archer Pull-Up',standard:'3×6 each',desc:'One arm pulls, other extends',yt:'https://www.youtube.com/results?search_query=archer+pull+up+tutorial'},
+    {name:'One-Arm Negative',standard:'3×5 each',desc:'Jump to top, lower slowly 5-10s',yt:'https://www.youtube.com/results?search_query=one+arm+pull+up+negative+tutorial'},
+    {name:'Band-Assisted OAP',standard:'3×5 each',desc:'Light band around wrist',yt:'https://www.youtube.com/results?search_query=one+arm+pull+up+band+assisted'},
+    {name:'One-Arm Pull-Up',standard:'3×3 each',desc:'Full ROM, dead hang start',yt:'https://www.youtube.com/results?search_query=one+arm+pull+up+tutorial'},
+    {name:'One-Arm Chin-Up',standard:'3×3 each',desc:'Supinated grip',yt:'https://www.youtube.com/results?search_query=one+arm+chin+up+tutorial'},
+    {name:'OAP Variations',standard:'3×3 each',desc:'Weighted / L-sit / ring OAP',yt:'https://www.youtube.com/results?search_query=one+arm+pull+up+advanced+variations'},
+  ]},
+};
+
+// ════════════════════════════════════════════════════════════════
+// SESSIONS — 7 DAY PROGRAM
+// ════════════════════════════════════════════════════════════════
+const SESSIONS = {
+  push_a:{
+    label:'PUSH A',desc:'Planche + Handstand + Upper Plyometrics',color:'#1A3A5A',
+    blocks:[
+      {title:'JOINT PREP',type:'prehab',exes:[
+        {id:'pa_wrist',name:'Full Wrist Circuit',sets:1,reps:'8 min full circuit',rest:0,cue:'1. Wrist circles — 10 rotations each direction, both wrists\n2. Prayer stretch — hands together, elbows out, press down 30s\n3. Reverse prayer — backs of hands together, press up 30s\n4. Floor extension — hands flat, fingers forward, weight-bearing shifts 30s\n5. Finger extensions — spread fingers wide, hold 5s × 10 reps\n6. Gripper squeezes — 10 reps each hand\n7. Fat grip dead hang — 15-30s\nNEVER skip. Pay extra attention to the hardware wrist.'},
+        {id:'pa_scap_pu',name:'Scapular Push-Up',sets:2,reps:'×12',rest:30,cue:'Plank position, straight arms. Let chest sink (scapulae wing), then protract hard. No elbow bend. Warms serratus anterior — critical for planche.\nYT: youtube.com/results?search_query=scapular+push+up+tutorial'},
+        {id:'pa_cars',name:'Shoulder CARs',sets:1,reps:'×5 each direction',rest:0,cue:'Controlled Articular Rotations. Maximum range, slow, under tension. Every upper session.\nYT: youtube.com/results?search_query=shoulder+CARs+controlled+articular+rotations'},
+        {id:'pa_bpa',name:'Band Pull-Apart',sets:2,reps:'×20',rest:30,cue:'Pronated grip, pull to chest. Rear delt and scapular retractor warmup.'},
+      ]},
+      {title:'SKILL WORK',type:'skill',exes:[
+        {id:'pa_planche',name:'Planche Progression',sets:4,reps:'Current level standard',rest:120,track:'planche',type:'skill',cue:'Shoulders past wrists. Posterior pelvic tilt. Depress and protract scapulae hard. Arms perfectly straight.'},
+        {id:'pa_hs',name:'Handstand Progression',sets:4,reps:'Current level standard',rest:90,track:'handstand',type:'skill',cue:'Press actively through floor. Ribs down. Straight line wrists to toes. Finger pressure for balance.'},
+        {id:'pa_hspu',name:'HSPU Progression',sets:3,reps:'Current level standard',rest:90,track:'hspu',type:'skill',cue:'Match your current HSPU progression level. Full ROM every rep.'},
+      ]},
+      {title:'UPPER PLYOMETRICS',type:'plyo',note:'ROTATE week to week — do not repeat same variation each session.',exes:[
+        {id:'pa_plyo1',name:'Clapping Push-Up',sets:3,reps:'×5',rest:90,cue:'Explosive push, clap at chest, soft catch. ROTATE with: chest explosive PU, ring plyo PU, plyo dip.\nYT: youtube.com/results?search_query=clapping+push+up+tutorial+plyometric'},
+        {id:'pa_plyo2',name:'Plyo Dip / Ring Plyo PU',sets:3,reps:'×5',rest:90,cue:'Plyo dip: explosive lockout, airborne, soft landing. Ring plyo PU: push off rings, land back on rings. Match level.\nYT: youtube.com/results?search_query=plyometric+dip+explosive+dips+tutorial'},
+      ]},
+      {title:'ASSISTANCE',type:'assist',exes:[
+        {id:'pa_facepull',name:'Face Pull (band/cable)',sets:4,reps:'×15-20',rest:60,cue:'Pull to forehead. Externally rotate at finish. NEVER skip on push days — balances all pressing volume.'},
+        {id:'pa_ytw',name:'Y/T/W Raises (prone)',sets:3,reps:'×12 each',rest:60,cue:'Prone. Y=arms forward, T=arms out, W=elbows bent. Lower trap + rear delt. Minimal weight. Use light DB or plates.\nYT: youtube.com/results?search_query=YTW+raises+lower+trapezius+tutorial'},
+        {id:'pa_ext_rot',name:'External Rotation (band)',sets:3,reps:'×15 each arm',rest:45,cue:'Elbow at 90°, rotate outward against band. Rotator cuff isolation. Every push day.'},
+        {id:'pa_gripper',name:'Gripper + Wrist Curl',sets:2,reps:'×10 each / ×15',rest:60,cue:'Gripper ×10 each hand then wrist curls. Forearm strength for wrist longevity.'},
+        {id:'pa_deadbug',name:'Dead Bug',sets:3,reps:'×10 each side',rest:60,cue:'Lower back imprinted on floor. Extend opposite arm and leg. Full exhale at extension.\nYT: youtube.com/results?search_query=dead+bug+exercise+tutorial+core'},
+        {id:'pa_hollow',name:'Hollow Body Hold',sets:3,reps:'30-45s',rest:60,cue:'Ribcage down, lower back pressed to floor, legs as low as possible. Foundation of every gymnastics movement.'},
+        {id:'pa_arch',name:'Arch Body Hold',sets:3,reps:'30-45s',rest:60,cue:'Lie prone, extend arms and legs, hold arch. Equal and opposite to hollow body.'},
+        {id:'pa_neck',name:'Neck 4-Way Isometric',sets:1,reps:'10s each direction',rest:30,cue:'Press head into hand: forward, back, left, right. Neck strength critical for handstand safety.'},
+      ]},
+      {title:'FLEXIBILITY',type:'flex',exes:[
+        {id:'pa_chest_str',name:'Doorframe Chest Stretch',sets:3,reps:'45s',rest:15,cue:'Arm at 90° on doorframe, rotate away. Pec minor and anterior shoulder.'},
+        {id:'pa_overhead_str',name:'Overhead Shoulder Stretch',sets:3,reps:'45s each',rest:15,cue:'One arm overhead, pull elbow behind head. Tricep and lat. Required for handstand position.'},
+        {id:'pa_wrist_str',name:'Wrist Flexor Stretch',sets:3,reps:'30s each',rest:15,cue:'Arm extended, pull fingers back. Extra attention to hardware side.'},
+        {id:'pa_pike_str',name:'Standing Pike',sets:3,reps:'60s',rest:15,cue:'Legs straight, fold forward. Hamstring flex is prerequisite for press to handstand.'},
+      ]},
+    ]
+  },
+  pull_a:{
+    label:'PULL A',desc:'Front Lever + Muscle-Up + One-Arm Pull',color:'#1A5C38',
+    blocks:[
+      {title:'JOINT PREP',type:'prehab',exes:[
+        {id:'pla_wrist',name:'Full Wrist Circuit',sets:1,reps:'8 min full circuit',rest:0,cue:'1. Wrist circles — 10 rotations each direction, both wrists\n2. Prayer stretch — hands together, elbows out, press down 30s\n3. Reverse prayer — backs of hands together, press up 30s\n4. Floor extension — hands flat, fingers forward, weight-bearing shifts 30s\n5. Finger extensions — spread fingers wide, hold 5s × 10 reps\n6. Gripper squeezes — 10 reps each hand\n7. Fat grip dead hang — 15-30s\nNEVER skip.'},
+        {id:'pla_scap_pullup',name:'Scapular Pull-Up',sets:3,reps:'×12',rest:30,cue:'Dead hang. Without bending elbows, depress the scapulae. Lower traps and serratus. Critical for front lever.\nYT: youtube.com/results?search_query=scapular+pull+up+dead+hang+tutorial'},
+        {id:'pla_bpa',name:'Band Pull-Apart (pronated + supinated)',sets:3,reps:'×20 each',rest:30,cue:'Pronated first, supinated second. Full arm extension each rep.'},
+        {id:'pla_hang',name:'Dead Hang + Passive Shoulder',sets:2,reps:'60s',rest:30,cue:'Relax everything. Let shoulder joint decompress before loading.'},
+      ]},
+      {title:'SKILL WORK',type:'skill',exes:[
+        {id:'pla_fl',name:'Front Lever Progression',sets:4,reps:'Current level standard',rest:120,track:'front_lever',type:'skill',cue:'Arms straight. Lats pulling bar toward hips. Hollow body throughout. Depress scapulae.'},
+        {id:'pla_mu',name:'Muscle-Up Progression',sets:4,reps:'Current level standard',rest:120,track:'muscle_up',type:'skill',cue:'Pull fast and HIGH, then immediately press. The transition is the hardest part.'},
+        {id:'pla_oap',name:'One-Arm Pull-Up Progression',sets:3,reps:'Current level standard',rest:120,track:'one_arm_pull',type:'skill',cue:'Full dead hang start. One arm does all the work. Build eccentric before concentric.'},
+      ]},
+      {title:'ASSISTANCE',type:'assist',exes:[
+        {id:'pla_ringrow',name:'Ring Row (feet elevated)',sets:4,reps:'×10-12',rest:60,cue:'Body straight, pull chest to rings, full protraction at bottom. Horizontal pull to balance vertical.'},
+        {id:'pla_facepull',name:'Face Pull',sets:3,reps:'×20',rest:45,cue:'Every pull session. Rear delt and external rotation.'},
+        {id:'pla_bpa_vol',name:'Band Pull-Apart (volume)',sets:4,reps:'×25',rest:30,cue:'High rep, low load. Shoulder durability insurance.'},
+        {id:'pla_wristcurl',name:'Wrist Curl + Reverse Wrist Curl',sets:3,reps:'×15 each',rest:45,cue:'Seated, forearm on thigh. Curl up (flexors), then reverse (extensors). Full forearm balance.'},
+        {id:'pla_fatgrip',name:'Fat Grip Dead Hang',sets:3,reps:'30-60s',rest:60,cue:'Fat grips on bar. Builds crushing grip and forearm endurance. One-arm pull-up prep.'},
+        {id:'pla_ttb',name:'Toes to Bar',sets:3,reps:'×8-12',rest:60,cue:'Dead hang, controlled, toes to bar. Hip flexor + anti-gravity core.\nYT: youtube.com/results?search_query=toes+to+bar+strict+tutorial'},
+        {id:'pla_dragon',name:'Dragon Flag Negative',sets:3,reps:'×5',rest:90,cue:'Grip bench above head. Body straight, lower slowly from vertical. Elite anti-extension core.\nYT: youtube.com/results?search_query=dragon+flag+negative+tutorial'},
+        {id:'pla_abwheel',name:'Ab Wheel Rollout',sets:3,reps:'×8-12',rest:60,cue:'From knees. Full extension only when lower back stays neutral.'},
+      ]},
+      {title:'FLEXIBILITY',type:'flex',exes:[
+        {id:'pla_germ',name:'German Hang (passive)',sets:3,reps:'20-30s',rest:60,cue:'From inverted hang on rings, lower into posterior shoulder stretch. Build time gradually. Back lever and iron cross prerequisite.\nYT: youtube.com/results?search_query=german+hang+tutorial+rings+back+lever'},
+        {id:'pla_lat',name:'Lat Stretch (overhead)',sets:3,reps:'45s each',rest:15,cue:'One arm overhead on bar or wall, lean away. Full lat length.'},
+        {id:'pla_pike',name:'Seated Pike (active)',sets:3,reps:'60s',rest:15,cue:'Legs straight, fold forward. Flex quads to relax hamstrings. Press-to-HS prerequisite.'},
+        {id:'pla_pancake',name:'Pancake Stretch',sets:3,reps:'60s',rest:15,cue:'Wide straddle, chest toward floor. Breathe into adductors.'},
+      ]},
+    ]
+  },
+  legs_a:{
+    label:'LEGS A',desc:'Pistol Squat + Nordic Curl + Lower Plyometrics',color:'#4A1A6B',
+    blocks:[
+      {title:'JOINT PREP',type:'prehab',exes:[
+        {id:'la_ankle',name:'Ankle Circles + CARs',sets:2,reps:'×10 each direction',rest:0,cue:'Full range circles both ankles, both directions. Then controlled articular rotations. Plyo injury prevention starts at the ankle.'},
+        {id:'la_9090',name:'Hip 90/90 Stretch',sets:2,reps:'60s each side',rest:0,cue:'Front and rear shin both parallel. Sit tall. Internal and external hip rotation.\nYT: youtube.com/results?search_query=hip+90+90+stretch+tutorial+mobility'},
+        {id:'la_circles',name:'Hip Circle Walk',sets:2,reps:'×20 each direction',rest:0,cue:'Hip circle band around ankles. Lateral walks + monster walks. Glute med activation prevents knee valgus.'},
+        {id:'la_tib',name:'Tibialis Anterior Raise',sets:3,reps:'×20',rest:30,cue:'Heels on step, pull toes up. Most neglected leg muscle. Prevents shin splints + ankle instability in plyo.\nYT: youtube.com/results?search_query=tibialis+anterior+raise+shin+strength'},
+        {id:'la_calf',name:'Single-Leg Calf Raise',sets:2,reps:'×15 each',rest:30,cue:'Full ROM — deep stretch at bottom, full rise at top. Single leg from day one.'},
+        {id:'la_goblet',name:'Goblet Squat Warmup',sets:2,reps:'×10 light',rest:0,cue:'Pattern the movement. 20% of working weight.'},
+      ]},
+      {title:'SKILL WORK',type:'skill',exes:[
+        {id:'la_pistol',name:'Pistol Squat Progression',sets:3,reps:'Current level standard',rest:90,track:'pistol',type:'skill',cue:'Heel flat. Torso upright. Knee tracks over toes. Remove ring assistance progressively.'},
+        {id:'la_nordic',name:'Nordic Curl Progression',sets:3,reps:'Current level standard',rest:120,track:'nordic',type:'skill',cue:'Anchor feet. Lower as slowly as possible. The best hamstring exercise in existence.'},
+      ]},
+      {title:'LOWER PLYOMETRICS',type:'plyo',note:'ROTATE exercises each session — use all variations at your level. Progress level when all feel powerful and controlled.',exes:[
+        {id:'la_plyo1',name:'Broad Jump',sets:3,reps:'×5',rest:60,cue:'Max horizontal distance. Silent landing standard. Log distance. ROTATE with: box jump, skater jump.\nYT: youtube.com/results?search_query=broad+jump+tutorial+plyometrics'},
+        {id:'la_plyo2',name:'Box Jump / Lateral Bound',sets:3,reps:'×5',rest:60,cue:'Box jump: max height, step down, soft landing. Lateral bound: bilateral push sideways, stick landing. ROTATE these.\nYT: youtube.com/results?search_query=box+jump+tutorial+plyometrics'},
+        {id:'la_plyo3',name:'Depth Jump / Hurdle Hop',sets:3,reps:'×5',rest:90,cue:'Depth jump: step off box, land and IMMEDIATELY rebound. Hurdle hop: rapid bilateral hops, minimize ground time. ROTATE.\nYT: youtube.com/results?search_query=depth+jump+tutorial+reactive+strength'},
+        {id:'la_plyo4',name:'Single-Leg Variations',sets:3,reps:'×4-5 each',rest:90,cue:'Single-leg broad jump, skater bound, lateral stick landing. Unilateral power. Only after bilateral is solid.\nYT: youtube.com/results?search_query=skater+jump+lateral+bound+tutorial'},
+      ]},
+      {title:'ASSISTANCE',type:'assist',exes:[
+        {id:'la_stepup',name:'Step-Up (weighted)',sets:3,reps:'×10 each',rest:60,cue:'Drive through heel. Full hip extension at top. Add weight progressively.'},
+        {id:'la_revhyper',name:'Reverse Hyperextension',sets:3,reps:'×15-20',rest:90,cue:'Full arc. Decompresses spine while loading glutes and lower back. Every leg day.'},
+        {id:'la_rdl',name:'Single-Leg RDL (KB)',sets:3,reps:'×10 each',rest:60,cue:'Hip hinge, flat back, hamstring load. Balance challenge adds proprioception.'},
+        {id:'la_abduct',name:'Side-Lying Hip Abduction',sets:3,reps:'×15 each',rest:45,cue:'Controlled. Full ROM. Glute medius isolation — prevents knee valgus in every landing.'},
+        {id:'la_tib_load',name:'Tibialis Raise (loaded)',sets:3,reps:'×20',rest:45,cue:'Add small weight on foot progressively. Shin splint and ankle injury prevention.'},
+        {id:'la_calf_heavy',name:'Heavy Single-Leg Calf Raise',sets:4,reps:'×12',rest:60,cue:'Full ROM. Add KB or vest. Achilles and calf strength for landing absorption.'},
+        {id:'la_copen',name:'Copenhagen Plank',sets:3,reps:'20-30s each',rest:60,cue:'Top leg on bench, bottom leg off floor. Adductor strength — prevents groin injury in lateral plyo.\nYT: youtube.com/results?search_query=copenhagen+plank+tutorial+adductor'},
+        {id:'la_hollow',name:'Hollow Body',sets:3,reps:'30s',rest:45,cue:'Core bracing for all leg work. Lower back protection during single-leg loading.'},
+      ]},
+      {title:'FLEXIBILITY',type:'flex',exes:[
+        {id:'la_split_r',name:'Front Split (right)',sets:3,reps:'60s',rest:15,cue:'Rear knee on pad. Anterior pelvic tilt. Slide front foot forward. Log distance from floor.'},
+        {id:'la_split_l',name:'Front Split (left)',sets:3,reps:'60s',rest:15,cue:'Always train both sides equally. Asymmetries cause injury.'},
+        {id:'la_squat_hold',name:'Deep Squat Hold',sets:3,reps:'60s',rest:15,cue:'Heels flat if possible. Ankle dorsiflexion is the limiting factor in pistol depth.'},
+        {id:'la_hipflex',name:'Hip Flexor Lunge Stretch',sets:3,reps:'45s each',rest:15,cue:'Rear knee on floor, posterior pelvic tilt. Psoas stretch. Needed for full hip extension.'},
+        {id:'la_active_ham',name:'Active Hamstring Kick',sets:2,reps:'×10 each',rest:30,cue:'Standing, kick straight leg up. Active flexibility — muscles controlling the range.'},
+      ]},
+    ]
+  },
+  core_str:{
+    label:'CORE & STR ARM',desc:'L-Sit/Manna + Back Lever + Iron Cross',color:'#B8860B',
+    blocks:[
+      {title:'JOINT PREP',type:'prehab',exes:[
+        {id:'cs_wrist',name:'Full Wrist Circuit',sets:1,reps:'8 min full circuit',rest:0,cue:'1. Wrist circles — 10 rotations each direction, both wrists\n2. Prayer stretch — hands together, elbows out, press down 30s\n3. Reverse prayer — backs of hands together, press up 30s\n4. Floor extension — hands flat, fingers forward, weight-bearing shifts 30s\n5. Finger extensions — spread fingers wide, hold 5s × 10 reps\n6. Gripper squeezes — 10 reps each hand\n7. Fat grip dead hang — 15-30s\nExtra attention today — iron cross places extreme loads on wrist connective tissue.'},
+        {id:'cs_germ',name:'German Hang (passive)',sets:3,reps:'20-30s',rest:60,cue:'Primary warmup for back lever and iron cross. Posterior shoulder capsule stretch.'},
+        {id:'cs_scap',name:'Scapular Pull-Up',sets:2,reps:'×12',rest:30,cue:'Lower trap and serratus warmup for straight arm loading.'},
+        {id:'cs_cars',name:'Shoulder CARs',sets:1,reps:'×5 each direction',rest:0,cue:'Non-negotiable before iron cross work.'},
+      ]},
+      {title:'SKILL WORK',type:'skill',exes:[
+        {id:'cs_lsit',name:'L-Sit / Manna Progression',sets:4,reps:'Current level standard',rest:90,track:'lsit_manna',type:'skill',cue:'Arms locked. Press floor away. Active compression — do not just hang.'},
+        {id:'cs_bl',name:'Back Lever Progression',sets:4,reps:'Current level standard',rest:120,track:'back_lever',type:'skill',cue:'Arms straight. Hollow body. Build German hang mobility before each level.'},
+        {id:'cs_ic',name:'Iron Cross Progression',sets:3,reps:'Current level standard',rest:120,track:'iron_cross',type:'skill',cue:'The most patient skill in this program. Connective tissue adapts 3-4x slower than muscle. Years, not months.'},
+      ]},
+      {title:'ASSISTANCE',type:'assist',exes:[
+        {id:'cs_dragonf',name:'Dragon Flag (negative)',sets:3,reps:'×5',rest:90,cue:'Grip bench above head. Body straight, lower from vertical. Anti-gravity core king.\nYT: youtube.com/results?search_query=dragon+flag+negative+tutorial'},
+        {id:'cs_abwheel',name:'Ab Wheel Rollout',sets:3,reps:'×10',rest:60,cue:'From knees. Full extension only when lower back stays neutral.'},
+        {id:'cs_hang_lr',name:'Hanging Leg Raise',sets:3,reps:'×10-15',rest:60,cue:'Dead hang, raise legs to 90° (beginner) or toes to bar (advanced). No swinging.'},
+        {id:'cs_widerow',name:'Ring Row (wide grip)',sets:3,reps:'×12',rest:60,cue:'Wide grip simulates cross pulling. Horizontal pull for iron cross preparation.'},
+        {id:'cs_archer_row',name:'Archer Row',sets:3,reps:'×8 each',rest:60,cue:'One arm pulls, other extends straight. Direct one-arm and cross strength prep.\nYT: youtube.com/results?search_query=archer+row+tutorial+one+arm+row+progression'},
+        {id:'cs_jeff',name:'Jefferson Curl (current level)',sets:3,reps:'×8',rest:60,cue:'Roll down vertebra by vertebra. Never rush loading. Build 2.5-5 lbs every 4-6 weeks max.\nYT: youtube.com/results?search_query=jefferson+curl+tutorial+technique'},
+        {id:'cs_neck',name:'Neck Isometrics',sets:1,reps:'10s each direction',rest:30,cue:'All four directions. Critical for inverted work safety.'},
+      ]},
+      {title:'FLEXIBILITY',type:'flex',exes:[
+        {id:'cs_germ_hold',name:'German Hang (hold)',sets:3,reps:'30-45s',rest:60,cue:'Add time each week. Primary shoulder flexibility for all ring skills.'},
+        {id:'cs_thoracic',name:'Thoracic Extension (foam roller)',sets:3,reps:'60s per segment',rest:15,cue:'Roll along thoracic spine. Opens chest for back lever and bridge.'},
+        {id:'cs_pancake_act',name:'Pancake Stretch (active)',sets:3,reps:'60s',rest:15,cue:'Wide straddle, actively lift legs while folding. Active pancake = press-to-HS prerequisite.'},
+        {id:'cs_bridge',name:'Bridge / Wheel Pose',sets:3,reps:'30s',rest:30,cue:'Thoracic extension is the goal. Back lever and iron cross mobility.'},
+        {id:'cs_middle',name:'Middle Split Progression',sets:3,reps:'60s',rest:15,cue:'Feet against wall, slide out. Log hip height from floor.'},
+      ]},
+    ]
+  },
+  push_b:{
+    label:'PUSH B',desc:'Ring Strength + HSPU Volume + Upper Plyometrics',color:'#1A3A5A',
+    blocks:[
+      {title:'JOINT PREP',type:'prehab',exes:[
+        {id:'pb_wrist',name:'Full Wrist Circuit',sets:1,reps:'8 min full circuit',rest:0,cue:'1. Wrist circles — 10 rotations each direction, both wrists\n2. Prayer stretch — hands together, elbows out, press down 30s\n3. Reverse prayer — backs of hands together, press up 30s\n4. Floor extension — hands flat, fingers forward, weight-bearing shifts 30s\n5. Finger extensions — spread fingers wide, hold 5s × 10 reps\n6. Gripper squeezes — 10 reps each hand\n7. Fat grip dead hang — 15-30s\nNEVER skip.'},
+        {id:'pb_scap',name:'Scapular Push-Up',sets:2,reps:'×12',rest:30,cue:'Scapular protraction/retraction with straight arms.'},
+        {id:'pb_cars',name:'Shoulder CARs',sets:1,reps:'×5 each direction',rest:0,cue:'Full range, slow, under tension.'},
+        {id:'pb_bpa',name:'Band Pull-Apart',sets:2,reps:'×20',rest:30,cue:'Pronated grip, rear delt warmup.'},
+      ]},
+      {title:'SKILL WORK',type:'skill',exes:[
+        {id:'pb_ringpu',name:'Ring Push-Up',sets:3,reps:'×8-15',rest:90,cue:'Externally rotate rings at lockout. More shoulder stability than floor. Direct planche carryover.'},
+        {id:'pb_ringdip',name:'Ring Dip',sets:4,reps:'×5-10',rest:120,cue:'Full lockout at top with external rotation. Controlled descent. Chest to rings at bottom.\nYT: youtube.com/results?search_query=ring+dip+tutorial+external+rotation'},
+        {id:'pb_korean',name:'Korean Dip',sets:3,reps:'×5',rest:120,cue:'Rings behind body, extreme posterior shoulder extension. Only after ring dips are easy 3×10.\nYT: youtube.com/results?search_query=korean+dip+tutorial+rings+iron+cross'},
+        {id:'pb_hspu_vol',name:'HSPU Progression (volume)',sets:4,reps:'×8-10',rest:90,cue:'Match your current HSPU level. Volume day — higher reps, moderate effort.'},
+        {id:'pb_support',name:'Ring Support Hold',sets:3,reps:'30s',rest:90,cue:'Perfect lockout, rings turned out. Foundation for every ring skill.'},
+      ]},
+      {title:'UPPER PLYOMETRICS',type:'plyo',note:'ROTATE — different variation from Push A this week.',exes:[
+        {id:'pb_plyo1',name:'Explosive Push-Up Variation',sets:3,reps:'×5',rest:90,cue:'Choose different variation from Push A this week. Rotate: clap PU, behind-back clap, chest explosive, ring plyo PU.\nYT: youtube.com/results?search_query=explosive+push+up+variations+plyometric'},
+        {id:'pb_plyo2',name:'Plyo Push-Up / Dip Variation',sets:3,reps:'×5',rest:90,cue:'If you did clap PU on Push A, do plyo dip today. If you did ring plyo PU on Push A, try behind-back clap today. Always rotate.'},
+      ]},
+      {title:'ASSISTANCE',type:'assist',exes:[
+        {id:'pb_facepull',name:'Face Pull',sets:4,reps:'×20',rest:45,cue:'Every push session. Pulling volume to balance all pressing.'},
+        {id:'pb_ytw',name:'Y/T/W Raises',sets:3,reps:'×12 each',rest:60,cue:'Lower trap and rear delt isolation.'},
+        {id:'pb_extrot',name:'External Rotation (band)',sets:3,reps:'×15 each',rest:45,cue:'Rotator cuff protection every push day.'},
+        {id:'pb_tricep',name:'Tricep Dip / Pushdown',sets:3,reps:'×12-15',rest:60,cue:'Lockout strength is pushing strength. Tricep volume every push day.'},
+        {id:'pb_plank',name:'Plank Variations',sets:3,reps:'45-60s',rest:45,cue:'Rotate: standard plank, side plank, RKC plank. RKC: maximum tension, squeeze everything.\nYT: youtube.com/results?search_query=RKC+plank+tutorial+Pavel+tension'},
+        {id:'pb_pallof',name:'Pallof Press (band)',sets:3,reps:'×12 each side',rest:45,cue:'Anti-rotation core. Press band straight out, resist rotation. Essential for static skill body position.\nYT: youtube.com/results?search_query=pallof+press+anti+rotation+core'},
+        {id:'pb_neck',name:'Neck Isometrics',sets:1,reps:'10s each direction',rest:30,cue:'Four directions. Every upper session.'},
+      ]},
+      {title:'FLEXIBILITY',type:'flex',exes:[
+        {id:'pb_chest',name:'Doorframe Chest Stretch',sets:3,reps:'45s',rest:15,cue:'Pec and anterior shoulder lengthening.'},
+        {id:'pb_band_oh',name:'Overhead Band Stretch',sets:3,reps:'45s each',rest:15,cue:'Band overhead, walk hands apart. Full overhead shoulder mobility.'},
+        {id:'pb_childs',name:"Child's Pose (lat focus)",sets:3,reps:'60s',rest:15,cue:'Arms extended overhead, hips back. Full lat and thoracic stretch.'},
+        {id:'pb_thorot',name:'Thoracic Rotation',sets:2,reps:'×10 each',rest:30,cue:'Thread-the-needle or seated rotation. Thoracic mobility for overhead work.'},
+      ]},
+    ]
+  },
+  pull_b:{
+    label:'PULL B',desc:'Back Lever Volume + One-Arm + Iron Cross Assistance',color:'#1A5C38',
+    blocks:[
+      {title:'JOINT PREP',type:'prehab',exes:[
+        {id:'plb_wrist',name:'Full Wrist Circuit',sets:1,reps:'8 min full circuit',rest:0,cue:'1. Wrist circles — 10 rotations each direction, both wrists\n2. Prayer stretch — hands together, elbows out, press down 30s\n3. Reverse prayer — backs of hands together, press up 30s\n4. Floor extension — hands flat, fingers forward, weight-bearing shifts 30s\n5. Finger extensions — spread fingers wide, hold 5s × 10 reps\n6. Gripper squeezes — 10 reps each hand\n7. Fat grip dead hang — 15-30s\nNEVER skip.'},
+        {id:'plb_scap',name:'Scapular Pull-Up',sets:3,reps:'×12',rest:30,cue:'Lower trap and serratus. Critical for all straight arm pulling.'},
+        {id:'plb_bpa',name:'Band Pull-Apart (pronated + supinated)',sets:3,reps:'×20 each',rest:30,cue:'Both grips, full arm extension.'},
+        {id:'plb_hang',name:'Dead Hang',sets:2,reps:'60s',rest:30,cue:'Decompress shoulder joint before loading.'},
+      ]},
+      {title:'SKILL WORK',type:'skill',exes:[
+        {id:'plb_wtdpu',name:'Weighted Pull-Up / Chin-Up',sets:4,reps:'×5-8',rest:120,cue:'Full dead hang. Alternate pronated/supinated each set. Add weight via belt when 3×10 BW is easy.'},
+        {id:'plb_archer',name:'Archer Pull-Up',sets:3,reps:'×6 each',rest:90,cue:'One arm pulls, other extends straight. Primary one-arm pull-up builder.\nYT: youtube.com/results?search_query=archer+pull+up+tutorial+one+arm+progression'},
+        {id:'plb_ringrow',name:'Ring Row (varied angles)',sets:3,reps:'×12',rest:60,cue:'Change foot position each set. Full horizontal pulling volume.'},
+        {id:'plb_bl',name:'Back Lever Progression',sets:4,reps:'Current level standard',rest:120,track:'back_lever',type:'skill',cue:'Volume day. Stay at current level. Quality time accumulation.'},
+        {id:'plb_ic',name:'Iron Cross Assistance Work',sets:3,reps:'Current level standard',rest:120,track:'iron_cross',type:'skill',cue:'Ring fly or half cross as per level. Patient connective tissue work.'},
+      ]},
+      {title:'ASSISTANCE',type:'assist',exes:[
+        {id:'plb_fp',name:'Face Pull (high volume)',sets:5,reps:'×20',rest:45,cue:'100 total reps this session. Rear delt and rotator cuff volume.'},
+        {id:'plb_bpa2',name:'Band Pull-Apart (main volume)',sets:4,reps:'×25',rest:30,cue:'High rep, low load. Shoulder durability.'},
+        {id:'plb_wristcurl',name:'Wrist Curl + Reverse Curl',sets:3,reps:'×15 each',rest:45,cue:'Forearm balance and wrist health.'},
+        {id:'plb_fatgrip',name:'Fat Grip Hang + Gripper',sets:3,reps:'45s + ×10',rest:60,cue:'Grip endurance and strength.'},
+        {id:'plb_ttb',name:'Toes to Bar',sets:3,reps:'×10',rest:60,cue:'Hip flexor and anti-gravity core.'},
+        {id:'plb_side',name:'Side Plank + Hip Dip',sets:3,reps:'×15 each',rest:45,cue:'Lateral core stability. Hip dips from side plank.'},
+        {id:'plb_hollow_rock',name:'Hollow Body + Rock',sets:3,reps:'30s + ×10 rocks',rest:45,cue:'Hold hollow, then rock forward/back maintaining position. Gymnastic core timing.\nYT: youtube.com/results?search_query=hollow+body+hold+and+rock+tutorial+gymnastics'},
+      ]},
+      {title:'FLEXIBILITY',type:'flex',exes:[
+        {id:'plb_germ',name:'German Hang (progressive)',sets:3,reps:'30-45s',rest:60,cue:'Add time each week. Primary shoulder flexibility.'},
+        {id:'plb_pike',name:'Seated Pike (active + passive)',sets:3,reps:'60s each',rest:15,cue:'Active first, then passive. Full hamstring length.'},
+        {id:'plb_pancake',name:'Pancake (passive)',sets:3,reps:'90s',rest:15,cue:'Wide straddle. Log chest-to-floor distance.'},
+        {id:'plb_lat',name:'Lat Stretch (overhead)',sets:3,reps:'45s each',rest:15,cue:'Full lat lengthening for overhead positions.'},
+      ]},
+    ]
+  },
+  legs_b:{
+    label:'LEGS B + FLEX',desc:'Dragon Squat + Jefferson Curl + Bridge + Full Flexibility',color:'#4A1A6B',
+    blocks:[
+      {title:'JOINT PREP',type:'prehab',exes:[
+        {id:'lb_ankle',name:'Ankle Circles + CARs',sets:2,reps:'×10 each direction',rest:0,cue:'Same as Legs A. Non-negotiable.'},
+        {id:'lb_9090',name:'Hip 90/90 Stretch',sets:2,reps:'60s each side',rest:0,cue:'Internal and external hip rotation for all leg skills.'},
+        {id:'lb_circles',name:'Hip Circle Walk',sets:2,reps:'×20 each direction',rest:0,cue:'Glute med activation. Knee valgus prevention.'},
+        {id:'lb_tib',name:'Tibialis Anterior Raise',sets:3,reps:'×20',rest:30,cue:'Shin strength for plyo landing.'},
+        {id:'lb_calf',name:'Single-Leg Calf Raise',sets:2,reps:'×15 each',rest:30,cue:'Full ROM. Achilles and calf warmup.'},
+        {id:'lb_goblet',name:'Goblet Squat Warmup',sets:2,reps:'×10 light',rest:0,cue:'Pattern the squat.'},
+      ]},
+      {title:'SKILL WORK',type:'skill',exes:[
+        {id:'lb_bridge',name:'Bridge / Backbend Progression',sets:3,reps:'Current level standard',rest:90,track:'bridge',type:'skill',cue:'Thoracic extension is the goal. Not lumbar hyperextension.'},
+        {id:'lb_jeff',name:'Jefferson Curl Progression',sets:3,reps:'Current level standard',rest:60,track:'jefferson',type:'skill',cue:'Vertebra by vertebra. Never rush loading. 2.5-5 lb increments every 4-6 weeks.'},
+        {id:'lb_pistol2',name:'Pistol / Dragon Squat Practice',sets:3,reps:'Current level standard',rest:90,track:'pistol',type:'skill',cue:'Volume day for leg skills. Same progression as Legs A.'},
+      ]},
+      {title:'ADVANCED PLYOMETRICS',type:'plyo',note:'ROTATE exercises. Use all variations at your level — horizontal, vertical, lateral, rotational. Mix directions and surfaces.',exes:[
+        {id:'lb_plyo1',name:'Depth Jump / Box Jump Max',sets:3,reps:'×5',rest:90,cue:'Depth jump: step off, land, immediately rebound. Box jump: max height, full hip extension. ROTATE these.\nYT: youtube.com/results?search_query=depth+jump+tutorial+plyometrics+reactive'},
+        {id:'lb_plyo2',name:'Single-Leg Lateral Bound (stick)',sets:3,reps:'×5 each',rest:90,cue:'Push off one leg laterally, stick 2s landing on same leg. Frontal plane single-leg power.\nYT: youtube.com/results?search_query=single+leg+lateral+bound+stick+landing'},
+        {id:'lb_plyo3',name:'180° Jump / Hurdle Rapid Hop',sets:3,reps:'×4-5',rest:90,cue:'180° jump: rotate fully, stick landing. Hurdle rapid: minimal ground time between hops. ROTATE.\nYT: youtube.com/results?search_query=180+degree+jump+plyometric+tutorial'},
+        {id:'lb_plyo4',name:'Weighted Jump Squat',sets:3,reps:'×5',rest:120,cue:'KB or vest — MAX 20% bodyweight. Full explosion from squat. Log height.\nYT: youtube.com/results?search_query=weighted+jump+squat+tutorial+plyometric'},
+      ]},
+      {title:'ASSISTANCE',type:'assist',exes:[
+        {id:'lb_bss',name:'Bulgarian Split Squat (KB)',sets:3,reps:'×10 each',rest:75,cue:'Rear foot elevated. Drive through front heel. Quad and glute builder.\nYT: youtube.com/results?search_query=bulgarian+split+squat+tutorial+technique'},
+        {id:'lb_revhyper',name:'Reverse Hyperextension',sets:4,reps:'×15',rest:90,cue:'Full arc. Lower back and glute health. Every leg day.'},
+        {id:'lb_nordic2',name:'Nordic Curl (volume)',sets:3,reps:'Current level standard',rest:120,cue:'Hamstring volume day.'},
+        {id:'lb_stepdwn',name:'Box Step-Down (slow eccentric)',sets:3,reps:'×8 each',rest:60,cue:'Single leg, lower slowly 4s off box. Eccentric quad control. Knee health.\nYT: youtube.com/results?search_query=box+step+down+eccentric+quad+control'},
+        {id:'lb_sidestar',name:'Side Plank + Star',sets:3,reps:'20s each',rest:45,cue:'Side plank, raise top leg. Lateral hip stability.'},
+        {id:'lb_absuper',name:'Ab Wheel + Toes to Bar (superset)',sets:3,reps:'×10 each',rest:60,cue:'Back to back. Anti-extension then anti-gravity core.'},
+      ]},
+      {title:'FULL FLEXIBILITY SESSION',type:'flex',note:'Most important flexibility block of the week. Every track addressed. Do not rush.',exes:[
+        {id:'lb_germ',name:'German Hang',sets:3,reps:'30-45s',rest:45,cue:'Posterior shoulder. Back lever and iron cross prerequisite.'},
+        {id:'lb_pancake',name:'Pancake (active + passive)',sets:3,reps:'60s each',rest:15,cue:'Active first, then passive. Log chest-to-floor distance.'},
+        {id:'lb_pike',name:'Seated Pike',sets:3,reps:'90s',rest:15,cue:'Hamstring and lower back. Press-to-HS prerequisite.'},
+        {id:'lb_split_r',name:'Front Split (right)',sets:3,reps:'60s',rest:15,cue:'Log distance from floor.'},
+        {id:'lb_split_l',name:'Front Split (left)',sets:3,reps:'60s',rest:15,cue:'Both sides equally.'},
+        {id:'lb_middle',name:'Middle Split',sets:3,reps:'60s',rest:15,cue:'Wide straddle. Log hip height from floor.'},
+        {id:'lb_bridge_str',name:'Bridge / Wheel',sets:3,reps:'30s',rest:30,cue:'Thoracic extension. Back lever mobility.'},
+        {id:'lb_hipflex',name:'Hip Flexor Lunge',sets:2,reps:'60s each',rest:15,cue:'Psoas stretch. Hip extension range.'},
+        {id:'lb_thorot',name:'Thoracic Rotation',sets:2,reps:'×10 each',rest:15,cue:'Full upper back rotation.'},
+        {id:'lb_band_oh',name:'Overhead Band Stretch',sets:2,reps:'45s each',rest:15,cue:'Full shoulder overhead mobility.'},
+        {id:'lb_active_ham',name:'Active Hamstring Kick',sets:2,reps:'×10 each',rest:15,cue:'Active flexibility — muscles controlling the range.'},
+      ]},
+    ]
+  },
+};
+
+// ════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════
+let S = load() || {
+  view:'today',
+  dayOffset:0,
+  viewDayOffset:0,
+  bw:175,
+  skills:{},   // {trackId: levelIndex (0-5)}
+  logs:{},     // {dateKey-sesId: {exId: {sets:[{reps,weight,notes,done}], completed, recovery}}}
+  prs:{},      // {trackId: [{date, level, value}]}
+  prHistory:[], // [{date, name, value, unit}]
+  skillNotes:{}, // {trackId: string}
+  weeklyNotes:{},
+};
+// Init skill levels
+Object.keys(SKILLS).forEach(k=>{ if(S.skills[k]===undefined) S.skills[k]=0; });
+
+function ss(){save(S);}
+function dk(d){return(d||new Date()).toISOString().slice(0,10);}
+function todayKey(){return dk();}
+
+function getDayIndex(date){
+  const d=date||new Date();
+  const dStr=dk(d); // 'YYYY-MM-DD' local time
+  // Parse start as local date
+  const [sy,sm,sd]=PROGRAM_START_STR.split('-').map(Number);
+  const startLocal=new Date(sy,sm-1,sd);
+  const [dy,dm,dd2]=[d.getFullYear(),d.getMonth(),d.getDate()];
+  const dLocal=new Date(dy,dm,dd2);
+  const diff=Math.round((dLocal-startLocal)/86400000);
+  const adjusted=(((diff+(S.dayOffset||0))%7)+7)%7;
+  return adjusted;
+}
+function getCurrentSession(date){
+  const idx=getDayIndex(date);
+  return DAY_ORDER[idx];
+}
+function getWeekNum(date){
+  const d=date||new Date();
+  const [sy,sm,sd]=PROGRAM_START_STR.split('-').map(Number);
+  const startLocal=new Date(sy,sm-1,sd);
+  const dLocal=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const diff=Math.round((dLocal-startLocal)/86400000);
+  return Math.max(1,Math.floor(diff/7)+1);
+}
+function isDeloadWeek(date){
+  return getWeekNum(date)%4===0;
+}
+function logKey(sesId,date){return (dk(date))+'-'+sesId;}
+function getLog(sesId,date){return S.logs[logKey(sesId,date)]||{};}
+function setLog(sesId,date,data){S.logs[logKey(sesId,date)]=data;ss();}
+
+// ════════════════════════════════════════════════════════════════
+// VIEW ROUTER
+// ════════════════════════════════════════════════════════════════
+let currentView='today';
+function setView(v){
+  currentView=v;
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.id==='nav-'+v));
+  render();
+}
+
+function render(){
+  const m=document.getElementById('main');
+  if(currentView==='today') m.innerHTML=renderToday();
+  else if(currentView==='skills') m.innerHTML=renderSkills();
+  else if(currentView==='pr') m.innerHTML=renderPR();
+  else if(currentView==='summary') m.innerHTML=renderSummary();
+  else if(currentView==='more') m.innerHTML=renderMore();
+  updateTopbar();
+  attachEvents();
+}
+
+function updateTopbar(){
+  const wk=getWeekNum();
+  const deload=isDeloadWeek()?'<span style="color:#FFB347"> DELOAD</span>':'';
+  document.getElementById('topinfo').innerHTML='WK '+wk+deload;
+}
+
+// ════════════════════════════════════════════════════════════════
+// TODAY VIEW
+// ════════════════════════════════════════════════════════════════
+function renderToday(){
+  const voff=S.viewDayOffset||0;
+  const today=new Date();
+  today.setDate(today.getDate()+voff);
+  const isActualToday=voff===0;
+  const sesId=getCurrentSession(today);
+  const ses=SESSIONS[sesId];
+  const lk2=logKey(sesId,today);
+  const log=S.logs[lk2]||{sets:{},completed:false};
+  const deload=isDeloadWeek(today);
+
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <button onclick="navDay(-1)" style="width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);font-size:18px;cursor:pointer;color:var(--text2);">‹</button>
+    <div style="text-align:center;">
+      <div class="os" style="font-size:18px;font-weight:700;color:${ses.color};">${ses.label}</div>
+      <div style="font-size:12px;color:var(--text3);">${today.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}${isActualToday?' · TODAY':''}</div>
+      ${deload?'<span class="badge badge-gold">DELOAD</span>':''}
+    </div>
+    <button onclick="navDay(1)" style="width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);font-size:18px;cursor:pointer;color:${isActualToday?'var(--border)':'var(--text2)'};" ${isActualToday?'disabled':''}>›</button>
+  </div>
+  ${!isActualToday?`<div style="text-align:center;margin-bottom:10px;"><button onclick="S.viewDayOffset=0;ss();render();" style="background:#EEF4FF;border:none;border-radius:20px;padding:5px 14px;font-size:12px;color:var(--navy);font-weight:600;cursor:pointer;">↩ Back to Today</button></div>`:''}`;
+
+  if(deload){
+    h+=`<div class="card" style="background:#FFF8E6;border-color:#F5C84A;margin-bottom:12px;">
+      <div style="font-weight:600;color:var(--gold);margin-bottom:4px;">⚡ DELOAD WEEK</div>
+      <div style="font-size:13px;color:var(--text2);">Reduce all sets by 40-50%. Reduce holds by 30%. Skip all plyometrics. Flexibility work stays the same.</div>
+    </div>`;
+  }
+
+  // Recovery rating
+  const recov=log.recovery||0;
+  h+=`<div class="card" style="margin-bottom:10px;">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;margin-bottom:8px;">RECOVERY RATING</div>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      ${[1,2,3,4,5].map(n=>`<button onclick="setRecovery(${n})" style="width:40px;height:40px;border-radius:50%;border:2px solid ${recov===n?'var(--navy)':'var(--border)'};background:${recov===n?'var(--navy)':'transparent'};color:${recov===n?'#fff':'var(--text3)'};font-size:16px;cursor:pointer;font-weight:700;">
+        ${n<=1?'😴':n<=2?'😕':n<=3?'😐':n<=4?'😊':'💪'}
+      </button>`).join('')}
+    </div>
+  </div>`;
+
+  // Blocks
+  ses.blocks.forEach(block=>{
+    const blockTypeColors={prehab:'#F0F4FF',skill:'#FFF8F0',plyo:'#F0FFF4',assist:'#FFF0F8',flex:'#F5F0FF'};
+    const blockTypeBorder={prehab:'#B8C8F0',skill:'#F5C84A',plyo:'#A0DDB8',assist:'#F0B8D8',flex:'#C8B8F0'};
+    h+=`<div style="margin-bottom:4px;">
+      <div style="display:flex;align-items:center;gap:8px;margin:14px 0 8px;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <div class="os" style="font-size:11px;letter-spacing:2px;color:var(--text3);font-weight:700;">${block.title}</div>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+      ${block.note?`<div style="font-size:12px;color:var(--gold);background:#FFF8E6;border:1px solid #F5C84A;border-radius:8px;padding:8px 12px;margin-bottom:8px;">⚡ ${block.note}</div>`:''}
+    </div>`;
+
+    block.exes.forEach(ex=>{
+      const exLog=log[ex.id]||{sets:[],done:false};
+      const done=exLog.done||false;
+      // For skill exercises, show current level
+      let skillInfo='';
+      if(ex.track&&SKILLS[ex.track]){
+        const sk=SKILLS[ex.track];
+        const lvl=S.skills[ex.track]||0;
+        const lvlData=sk.levels[lvl];
+        skillInfo=`<span class="badge" style="background:${LEVEL_COLORS[lvl]}22;color:${LEVEL_COLORS[lvl]};font-size:10px;">${LEVEL_NAMES[lvl]}: ${lvlData.name}</span>`;
+      }
+
+      h+=`<div class="exrow ${done?'done':''}" id="ex-${ex.id}">
+        <div class="exrow-header" onclick="toggleEx('${ex.id}','${lk2}')">
+          <div class="check ${done?'done':''}">✓</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ex.name}</div>
+            <div style="font-size:12px;color:var(--text3);">${ex.sets} sets · ${ex.reps} · ${ex.rest?ex.rest+'s rest':'no rest'}</div>
+            ${skillInfo?`<div style="margin-top:3px;">${skillInfo}</div>`:''}
+          </div>
+          <div style="color:var(--text3);font-size:12px;">▾</div>
+        </div>
+        <div class="exrow-body" id="exbody-${ex.id}" style="display:none;">
+          ${renderExBody(ex, exLog, lk2)}
+        </div>
+      </div>`;
+    });
+  });
+
+  // Finish session button
+  const allSkillsDone=ses.blocks.every(b=>b.exes.every(e=>(log[e.id]||{}).done));
+  h+=`<div style="margin-top:16px;display:flex;gap:10px;">
+    <button class="btn btn-navy" style="flex:1;padding:14px;" onclick="finishSession('${sesId}')">
+      ${log.completed?'✓ SESSION COMPLETE':'FINISH SESSION'}
+    </button>
+    <button class="btn btn-ghost" onclick="pushDay()" style="padding:14px;">PUSH DAY</button>
+  </div>
+  <div style="height:20px;"></div>`;
+
+  return h;
+}
+
+function renderExBody(ex, exLog, logKeyStr){
+  const sets=exLog.sets||[];
+  const numSets=typeof ex.sets==='number'?ex.sets:3;
+
+  let h='';
+
+  // Coaching cue
+  const cueLines=(ex.cue||'').split('\n');
+  h+=`<div style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px;padding:8px;background:var(--surface);border-radius:6px;border:1px solid var(--border);">`;
+  cueLines.forEach(line=>{
+    if(line.startsWith('YT:')){
+      h+=`<div style="margin-top:4px;font-size:11px;color:var(--navy);word-break:break-all;">${line}</div>`;
+    } else {
+      h+=`<div>${line}</div>`;
+    }
+  });
+  h+=`</div>`;
+
+  // Skill level info
+  if(ex.track&&SKILLS[ex.track]){
+    const sk=SKILLS[ex.track];
+    const lvl=S.skills[ex.track]||0;
+    const lvlData=sk.levels[lvl];
+    const pct=Math.round((lvl/5)*100);
+    h+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div style="font-size:12px;font-weight:700;color:${LEVEL_COLORS[lvl]};">${LEVEL_NAMES[lvl]}: ${lvlData.name}</div>
+        <div style="font-size:11px;color:var(--text3);">Level ${lvl+1}/6</div>
+      </div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Standard: ${lvlData.standard}</div>
+      <div class="skill-bar"><div class="skill-bar-fill" style="width:${pct}%;"></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Mastery: ${sk.levels[5].name} — ${sk.levels[5].standard}</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-green" style="flex:1;font-size:11px;padding:7px;" onclick="advanceSkill('${ex.track}','${logKeyStr}','${ex.id}')">ADVANCE ↑</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:7px;" onclick="regressSkill('${ex.track}','${logKeyStr}','${ex.id}')">REGRESS ↓</button>
+        <a href="${lvlData.yt}" target="_blank" style="flex:1;display:flex;align-items:center;justify-content:center;background:#EEF4FF;color:var(--navy);border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;padding:7px;">▶ VIDEO</a>
+      </div>
+    </div>`;
+  }
+
+  // Set logging — Boostcamp style
+  if(numSets>0&&ex.type!=='prehab'){
+    h+=`<div style="margin-bottom:6px;">
+      <div class="set-header">
+        <div class="set-header-label">SET</div>
+        <div class="set-header-label">REPS / TIME</div>
+        <div class="set-header-label">WEIGHT</div>
+        <div class="set-header-label">DONE</div>
+      </div>`;
+    for(let i=0;i<numSets;i++){
+      const s=sets[i]||{reps:'',weight:'',done:false};
+      h+=`<div class="set-row">
+        <div class="set-num">${i+1}</div>
+        <input class="set-input ${s.done?'completed':''}" type="text" inputmode="decimal" placeholder="${ex.reps||'reps'}" value="${s.reps||''}" id="inp-reps-${ex.id}-${i}" onchange="saveSet('${ex.id}','${logKeyStr}',${i},'reps',this.value)"/>
+        <input class="set-input ${s.done?'completed':''}" type="text" inputmode="decimal" placeholder="lbs/s" value="${s.weight||''}" id="inp-wt-${ex.id}-${i}" onchange="saveSet('${ex.id}','${logKeyStr}',${i},'weight',this.value)"/>
+        <button class="set-complete-btn ${s.done?'done':''}" onclick="toggleSet('${ex.id}','${logKeyStr}',${i})" id="setbtn-${ex.id}-${i}">✓</button>
+      </div>`;
+    }
+    // Add set button
+    h+=`<div style="display:flex;gap:6px;margin-top:4px;">
+      <button onclick="addSet('${ex.id}','${logKeyStr}')" style="flex:1;padding:7px;background:var(--surface2);border:1px dashed var(--border);border-radius:7px;font-size:12px;color:var(--text3);cursor:pointer;">+ ADD SET</button>
+    </div></div>`;
+  } else if(ex.type==='prehab'){
+    // Prehab just has a done toggle
+    const d=(exLog.done||false);
+    h+=`<button onclick="togglePrehab('${ex.id}','${logKeyStr}')" class="btn ${d?'btn-green':'btn-ghost'}" style="width:100%;padding:12px;">${d?'✓ DONE':'MARK COMPLETE'}</button>`;
+  }
+
+  // Notes
+  h+=`<div style="margin-top:8px;">
+    <textarea placeholder="Notes (optional)..." style="width:100%;padding:8px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--surface);color:var(--text);min-height:50px;resize:vertical;" id="notes-${ex.id}" onchange="saveNotes('${ex.id}','${logKeyStr}',this.value)">${(exLog.notes||'')}</textarea>
+  </div>`;
+
+  return h;
+}
+
+// ════════════════════════════════════════════════════════════════
+// SKILLS VIEW
+// ════════════════════════════════════════════════════════════════
+function renderSkills(){
+  let h=`<div class="section-title">SKILL TRACKS</div>`;
+  Object.entries(SKILLS).forEach(([id,sk])=>{
+    const lvl=S.skills[id]||0;
+    const lvlData=sk.levels[lvl];
+    const pct=Math.round((lvl/5)*100);
+    const nextData=sk.levels[Math.min(lvl+1,5)];
+    h+=`<div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="font-size:22px;">${sk.icon}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:15px;">${sk.name}</div>
+          <div style="font-size:12px;color:var(--text3);">Level ${lvl+1} of 6</div>
+        </div>
+        <span class="badge" style="background:${LEVEL_COLORS[lvl]}22;color:${LEVEL_COLORS[lvl]};">${LEVEL_NAMES[lvl]}</span>
+      </div>
+      <div class="skill-bar"><div class="skill-bar-fill" style="width:${pct}%;"></div></div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;">Current: ${lvlData.name}</div>
+        <div style="font-size:12px;color:var(--text2);">Standard: ${lvlData.standard}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">${lvlData.desc}</div>
+      </div>
+      ${lvl<5?`<div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Next: ${nextData.name} — ${nextData.standard}</div>`:'<div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:8px;">🏆 MASTERY REACHED</div>'}
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        ${lvl<5?`<button class="btn btn-green" style="flex:1;font-size:11px;padding:8px;" onclick="advanceSkillDirect('${id}')">ADVANCE ↑</button>`:''}
+        ${lvl>0?`<button class="btn btn-ghost" style="flex:1;font-size:11px;padding:8px;" onclick="regressSkillDirect('${id}')">REGRESS ↓</button>`:''}
+        <a href="${lvlData.yt}" target="_blank" style="flex:1;display:flex;align-items:center;justify-content:center;background:#EEF4FF;color:var(--navy);border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;padding:8px;">▶ VIDEO</a>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;margin-bottom:6px;">ALL LEVELS</div>
+        ${sk.levels.map((l,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;${i<sk.levels.length-1?'border-bottom:1px solid var(--border);':''}">
+          <div style="width:8px;height:8px;border-radius:50%;background:${i<=lvl?LEVEL_COLORS[i]:'var(--border)'};flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <span style="font-size:12px;font-weight:${i===lvl?700:400};color:${i===lvl?'var(--text)':'var(--text3)'};">${LEVEL_NAMES[i]}: ${l.name}</span>
+            <span style="font-size:11px;color:var(--text3);"> — ${l.standard}</span>
+          </div>
+          ${i===lvl?'<span style="font-size:10px;font-weight:700;color:var(--navy);">NOW</span>':''}
+        </div>`).join('')}
+      </div>
+    </div>`;
+  });
+  return h;
+}
+
+// ════════════════════════════════════════════════════════════════
+// PR VIEW
+// ════════════════════════════════════════════════════════════════
+function renderPR(){
+  let h=`<div class="section-title">BODYWEIGHT</div>
+  <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+    <div style="flex:1;font-weight:600;">Current Bodyweight</div>
+    <input type="number" value="${S.bw||175}" style="width:80px;padding:8px;border:1px solid var(--border);border-radius:8px;text-align:center;font-size:16px;font-weight:700;" onchange="S.bw=parseFloat(this.value)||175;ss();"/>
+    <div style="font-size:13px;color:var(--text3);">lbs</div>
+  </div>`;
+
+  h+=`<div class="section-title">PR HISTORY</div>`;
+  if(!S.prHistory||S.prHistory.length===0){
+    h+=`<div class="card" style="color:var(--text3);text-align:center;padding:24px;">No PRs logged yet. Advance a skill level to log a PR.</div>`;
+  } else {
+    const recent=[...(S.prHistory||[])].reverse().slice(0,30);
+    recent.forEach(pr=>{
+      h+=`<div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:6px;">
+        <div style="font-size:20px;">🏆</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:14px;">${pr.name}</div>
+          <div style="font-size:12px;color:var(--text3);">${pr.date}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">${pr.value}</div>
+          <span class="badge badge-navy" style="font-size:10px;">${pr.level}</span>
+        </div>
+      </div>`;
+    });
+  }
+  return h;
+}
+
+// ════════════════════════════════════════════════════════════════
+// WEEKLY SUMMARY VIEW
+// ════════════════════════════════════════════════════════════════
+function renderSummary(){
+  const today=new Date();
+  const weekStart=new Date(today);
+  weekStart.setDate(today.getDate()-today.getDay());
+
+  let sessionsCompleted=0, totalRecovery=0, recovCount=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(weekStart);
+    d.setDate(weekStart.getDate()+i);
+    const sesId=getCurrentSession(d);
+    const lk2=logKey(sesId,d);
+    const log=S.logs[lk2]||{};
+    if(log.completed) sessionsCompleted++;
+    if(log.recovery){totalRecovery+=log.recovery;recovCount++;}
+  }
+  const avgRecov=recovCount>0?(totalRecovery/recovCount).toFixed(1):'—';
+
+  let h=`<div class="section-title">THIS WEEK — WK ${getWeekNum()}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div class="card" style="text-align:center;padding:16px;">
+      <div style="font-size:28px;font-weight:700;color:var(--navy);">${sessionsCompleted}</div>
+      <div style="font-size:11px;color:var(--text3);">SESSIONS</div>
+    </div>
+    <div class="card" style="text-align:center;padding:16px;">
+      <div style="font-size:28px;font-weight:700;color:var(--green);">${7-sessionsCompleted}</div>
+      <div style="font-size:11px;color:var(--text3);">REMAINING</div>
+    </div>
+    <div class="card" style="text-align:center;padding:16px;">
+      <div style="font-size:28px;font-weight:700;color:var(--gold);">${avgRecov}</div>
+      <div style="font-size:11px;color:var(--text3);">AVG RECOVERY</div>
+    </div>
+  </div>`;
+
+  h+=`<div class="section-title">WEEK OVERVIEW <span style="font-size:10px;font-weight:400;color:var(--text3);">— tap a day to preview</span></div>`;
+  for(let i=0;i<7;i++){
+    const d=new Date(weekStart);
+    d.setDate(weekStart.getDate()+i);
+    const sesId=getCurrentSession(d);
+    const ses=SESSIONS[sesId];
+    const lk2=logKey(sesId,d);
+    const log=S.logs[lk2]||{};
+    const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const isToday=dk(d)===dk(today);
+    h+=`<div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:6px;cursor:pointer;${isToday?'border-color:var(--navy);background:#EEF4FF;':''}" onclick="previewSession('${sesId}','${dayNames[d.getDay()]} ${d.getDate()}')">
+      <div style="width:42px;text-align:center;">
+        <div style="font-size:11px;color:var(--text3);">${dayNames[d.getDay()]}</div>
+        <div style="font-size:18px;font-weight:700;color:${isToday?'var(--navy)':'var(--text)'};">${d.getDate()}</div>
+      </div>
+      <div style="width:3px;height:40px;border-radius:2px;background:${ses.color};"></div>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:13px;">${ses.label}</div>
+        <div style="font-size:11px;color:var(--text3);">${ses.desc}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        ${log.completed?'<span class="badge badge-green">✓ DONE</span>':isToday?'<span class="badge badge-navy">TODAY</span>':'<span class="badge" style="background:var(--surface2);color:var(--text3);">—</span>'}
+        <span style="color:var(--text3);font-size:14px;">›</span>
+      </div>
+    </div>`;
+  }
+
+  h+=`<div class="section-title">SKILL PROGRESS</div>`;
+  Object.entries(SKILLS).forEach(([id,sk])=>{
+    const lvl=S.skills[id]||0;
+    const pct=Math.round((lvl/5)*100);
+    h+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div style="width:100px;font-size:12px;color:var(--text2);font-weight:500;">${sk.name}</div>
+      <div style="flex:1;"><div class="skill-bar"><div class="skill-bar-fill" style="width:${pct}%;"></div></div></div>
+      <div style="width:80px;font-size:11px;color:${LEVEL_COLORS[lvl]};font-weight:600;text-align:right;">${LEVEL_NAMES[lvl]}</div>
+    </div>`;
+  });
+
+  return h;
+}
+
+// ════════════════════════════════════════════════════════════════
+// MORE / SETTINGS VIEW
+// ════════════════════════════════════════════════════════════════
+function renderMore(){
+  const wk=getWeekNum();
+  const nextDeload=wk%4===0?'This week!':4-(wk%4)+' weeks';
+  return `<div class="section-title">PROGRAM INFO</div>
+  <div class="card" style="margin-bottom:10px;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+      <span style="color:var(--text2);">Current Week</span><span style="font-weight:700;">Week ${wk}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+      <span style="color:var(--text2);">Next Deload</span><span style="font-weight:700;color:var(--gold);">${nextDeload}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;">
+      <span style="color:var(--text2);">Program Start</span><span style="font-weight:700;">${new Date(PROGRAM_START_STR+'T12:00:00').toLocaleDateString()}</span>
+    </div>
+  </div>
+
+  <div class="section-title">TOOLS</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+    <button class="btn btn-navy" style="padding:14px;" onclick="openTimer()">⏱ TIMER</button>
+    <button class="btn btn-ghost" style="padding:14px;" onclick="pushDay()">PUSH DAY →</button>
+  </div>
+
+  <div class="section-title">DATA</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <button class="btn btn-green" style="padding:14px;" onclick="exportData()">↑ EXPORT</button>
+    <label class="btn btn-ghost" style="padding:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+      ↓ IMPORT<input type="file" accept=".json" onchange="importData(event)" style="display:none;"/>
+    </label>
+  </div>
+
+  <div class="section-title" style="margin-top:16px;">DELOAD GUIDE</div>
+  <div class="card">
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;">
+      Every 4th week:<br>
+      • Reduce all sets by 40-50%<br>
+      • Reduce all holds by 30%<br>
+      • Reduce rep targets by 30-40%<br>
+      • Skip all plyometrics<br>
+      • Keep movements — maintain motor patterns<br>
+      • Flexibility stays the same or increases<br>
+      • Prehab stays non-negotiable
+    </div>
+  </div>
+
+  <div class="section-title">RESET</div>
+  <button class="btn btn-red" style="width:100%;padding:14px;" onclick="confirmReset()">RESET ALL DATA</button>
+  <div style="height:20px;"></div>`;
+}
+
+// ════════════════════════════════════════════════════════════════
+// TIMER
+// ════════════════════════════════════════════════════════════════
+let timerInterval=null, timerSeconds=90, timerTarget=90, timerRunning=false, timerMode='rest', timerElapsed=0;
+
+function openTimer(){
+  document.getElementById('timer-overlay').style.display='flex';
+}
+function closeTimer(){
+  document.getElementById('timer-overlay').style.display='none';
+}
+function timerSetMode(m){
+  timerMode=m;
+  document.getElementById('tbtn-rest').style.background=m==='rest'?'var(--navy)':'transparent';
+  document.getElementById('tbtn-rest').style.color=m==='rest'?'#fff':'var(--text3)';
+  document.getElementById('tbtn-hold').style.background=m==='hold'?'var(--navy)':'transparent';
+  document.getElementById('tbtn-hold').style.color=m==='hold'?'#fff':'var(--text3)';
+  timerReset();
+}
+function timerReset(){
+  clearInterval(timerInterval);timerRunning=false;timerElapsed=0;
+  if(timerMode==='rest'){timerSeconds=timerTarget;}
+  else{timerSeconds=0;}
+  updateTimerDisplay();
+  document.getElementById('timer-startbtn').textContent='START';
+  document.getElementById('timer-done').style.display='none';
+}
+function timerStartStop(){
+  if(timerRunning){
+    clearInterval(timerInterval);timerRunning=false;
+    document.getElementById('timer-startbtn').textContent='RESUME';
+  } else {
+    timerRunning=true;
+    document.getElementById('timer-startbtn').textContent='PAUSE';
+    timerInterval=setInterval(()=>{
+      if(timerMode==='rest'){
+        timerSeconds--;
+        if(timerSeconds<=0){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-done').style.display='block';document.getElementById('timer-startbtn').textContent='DONE';}
+      } else {
+        timerSeconds++;
+      }
+      updateTimerDisplay();
+    },1000);
+  }
+}
+function timerPreset(s){timerTarget=s;timerReset();}
+function timerAdjust(d){timerTarget=Math.max(5,timerTarget+d*5);timerReset();}
+function updateTimerDisplay(){
+  const disp=timerMode==='rest'?Math.max(0,timerSeconds):timerSeconds;
+  const m=Math.floor(disp/60),s=disp%60;
+  document.getElementById('timer-display').textContent=m>0?m+':'+(s<10?'0':'')+s:disp;
+  if(timerMode==='rest'){
+    const pct=timerTarget>0?Math.max(0,timerSeconds/timerTarget):0;
+    const circ=2*Math.PI*52;
+    const offset=circ*(1-pct);
+    document.getElementById('timer-ring').style.strokeDashoffset=offset;
+  } else {
+    document.getElementById('timer-ring').style.strokeDashoffset=0;
+  }
+  document.getElementById('timer-target-label').textContent=timerMode==='rest'?timerTarget+'s target':'hold '+timerSeconds+'s';
+}
+
+// ════════════════════════════════════════════════════════════════
+// EVENT HANDLERS
+// ════════════════════════════════════════════════════════════════
+function attachEvents(){
+  // Re-open exercise bodies that were open
+}
+
+function toggleEx(exId, lkStr){
+  const body=document.getElementById('exbody-'+exId);
+  if(!body)return;
+  body.style.display=body.style.display==='none'?'block':'none';
+}
+
+function setRecovery(n){
+  const today=new Date();today.setDate(today.getDate()+(S.viewDayOffset||0));
+  const sesId=getCurrentSession(today);
+  const lk2=logKey(sesId,today);
+  if(!S.logs[lk2])S.logs[lk2]={};
+  S.logs[lk2].recovery=n;ss();
+  render();
+}
+
+function saveSet(exId, lkStr, setIdx, field, val){
+  if(!S.logs[lkStr])S.logs[lkStr]={};
+  if(!S.logs[lkStr][exId])S.logs[lkStr][exId]={sets:[]};
+  while(S.logs[lkStr][exId].sets.length<=setIdx)S.logs[lkStr][exId].sets.push({reps:'',weight:'',done:false});
+  S.logs[lkStr][exId].sets[setIdx][field]=val;
+  ss();
+}
+
+function toggleSet(exId, lkStr, setIdx){
+  if(!S.logs[lkStr])S.logs[lkStr]={};
+  if(!S.logs[lkStr][exId])S.logs[lkStr][exId]={sets:[]};
+  while(S.logs[lkStr][exId].sets.length<=setIdx)S.logs[lkStr][exId].sets.push({reps:'',weight:'',done:false});
+  // Capture current input values before toggling
+  const repsInput=document.getElementById(`inp-reps-${exId}-${setIdx}`);
+  const wtInput=document.getElementById(`inp-wt-${exId}-${setIdx}`);
+  if(repsInput)S.logs[lkStr][exId].sets[setIdx].reps=repsInput.value;
+  if(wtInput)S.logs[lkStr][exId].sets[setIdx].weight=wtInput.value;
+  S.logs[lkStr][exId].sets[setIdx].done=!S.logs[lkStr][exId].sets[setIdx].done;
+  // Check if all sets done → mark exercise done
+  const allDone=S.logs[lkStr][exId].sets.every(s=>s.done);
+  S.logs[lkStr][exId].done=allDone;
+  ss();
+  // Update UI
+  const btn=document.getElementById(`setbtn-${exId}-${setIdx}`);
+  const repsEl=document.getElementById(`inp-reps-${exId}-${setIdx}`);
+  const wtEl=document.getElementById(`inp-wt-${exId}-${setIdx}`);
+  const done=S.logs[lkStr][exId].sets[setIdx].done;
+  if(btn){btn.classList.toggle('done',done);}
+  if(repsEl){repsEl.classList.toggle('completed',done);}
+  if(wtEl){wtEl.classList.toggle('completed',done);}
+  const exrow=document.getElementById('ex-'+exId);
+  const check=exrow&&exrow.querySelector('.check');
+  if(allDone){
+    exrow&&exrow.classList.add('done');
+    check&&check.classList.add('done');
+  }
+}
+
+function addSet(exId, lkStr){
+  if(!S.logs[lkStr])S.logs[lkStr]={};
+  if(!S.logs[lkStr][exId])S.logs[lkStr][exId]={sets:[]};
+  S.logs[lkStr][exId].sets.push({reps:'',weight:'',done:false});
+  ss();
+  // Re-render the body only
+  const today=new Date();today.setDate(today.getDate()+(S.viewDayOffset||0));
+  const sesId=getCurrentSession(today);
+  const ses=SESSIONS[sesId];
+  // Find the exercise
+  let ex=null;
+  ses.blocks.forEach(b=>b.exes.forEach(e=>{if(e.id===exId)ex=e;}));
+  if(!ex)return;
+  const body=document.getElementById('exbody-'+exId);
+  if(body)body.innerHTML=renderExBody(ex,S.logs[lkStr][exId]||{},lkStr);
+}
+
+function togglePrehab(exId, lkStr){
+  if(!S.logs[lkStr])S.logs[lkStr]={};
+  if(!S.logs[lkStr][exId])S.logs[lkStr][exId]={};
+  S.logs[lkStr][exId].done=!S.logs[lkStr][exId].done;
+  ss();
+  const today=new Date();today.setDate(today.getDate()+(S.viewDayOffset||0));
+  const sesId=getCurrentSession(today);
+  const ses=SESSIONS[sesId];
+  let ex=null;
+  ses.blocks.forEach(b=>b.exes.forEach(e=>{if(e.id===exId)ex=e;}));
+  if(!ex)return;
+  const body=document.getElementById('exbody-'+exId);
+  if(body)body.innerHTML=renderExBody(ex,S.logs[lkStr][exId]||{},lkStr);
+  const exrow=document.getElementById('ex-'+exId);
+  const check=exrow&&exrow.querySelector('.check');
+  if(S.logs[lkStr][exId].done){
+    exrow&&exrow.classList.add('done');
+    check&&check.classList.add('done');
+  } else {
+    exrow&&exrow.classList.remove('done');
+    check&&check.classList.remove('done');
+  }
+}
+
+function saveNotes(exId, lkStr, val){
+  if(!S.logs[lkStr])S.logs[lkStr]={};
+  if(!S.logs[lkStr][exId])S.logs[lkStr][exId]={};
+  S.logs[lkStr][exId].notes=val;ss();
+}
+
+function advanceSkill(trackId, lkStr, exId){
+  const lvl=S.skills[trackId]||0;
+  if(lvl>=5){showToast('Already at Mastery!');return;}
+  S.skills[trackId]=lvl+1;
+  const sk=SKILLS[trackId];
+  const newLvl=sk.levels[lvl+1];
+  if(!S.prHistory)S.prHistory=[];
+  S.prHistory.push({date:dk(),name:sk.name+' → '+newLvl.name,value:LEVEL_NAMES[lvl+1],level:newLvl.standard});
+  ss();
+  showToast('↑ Advanced to '+LEVEL_NAMES[lvl+1]+'!');
+  // Re-render the exercise body
+  const today=new Date();today.setDate(today.getDate()+(S.viewDayOffset||0));
+  const sesId=getCurrentSession(today);
+  const ses=SESSIONS[sesId];
+  let ex=null;
+  ses.blocks.forEach(b=>b.exes.forEach(e=>{if(e.id===exId)ex=e;}));
+  if(ex){
+    const body=document.getElementById('exbody-'+exId);
+    if(body)body.innerHTML=renderExBody(ex,S.logs[lkStr]&&S.logs[lkStr][exId]?S.logs[lkStr][exId]:{},lkStr);
+  }
+}
+
+function regressSkill(trackId, lkStr, exId){
+  const lvl=S.skills[trackId]||0;
+  if(lvl<=0){showToast('Already at Beginner.');return;}
+  S.skills[trackId]=lvl-1;ss();
+  showToast('↓ Regressed to '+LEVEL_NAMES[lvl-1]);
+  const today=new Date();today.setDate(today.getDate()+(S.viewDayOffset||0));
+  const sesId=getCurrentSession(today);
+  const ses=SESSIONS[sesId];
+  let ex=null;
+  ses.blocks.forEach(b=>b.exes.forEach(e=>{if(e.id===exId)ex=e;}));
+  if(ex){
+    const body=document.getElementById('exbody-'+exId);
+    if(body)body.innerHTML=renderExBody(ex,S.logs[lkStr]&&S.logs[lkStr][exId]?S.logs[lkStr][exId]:{},lkStr);
+  }
+}
+
+function advanceSkillDirect(trackId){
+  const lvl=S.skills[trackId]||0;
+  if(lvl>=5){showToast('Already at Mastery!');return;}
+  S.skills[trackId]=lvl+1;
+  const sk=SKILLS[trackId];
+  if(!S.prHistory)S.prHistory=[];
+  S.prHistory.push({date:dk(),name:sk.name+' → '+sk.levels[lvl+1].name,value:LEVEL_NAMES[lvl+1],level:sk.levels[lvl+1].standard});
+  ss();
+  showToast('↑ Advanced to '+LEVEL_NAMES[lvl+1]+'!');
+  render();
+}
+
+function regressSkillDirect(trackId){
+  const lvl=S.skills[trackId]||0;
+  if(lvl<=0){showToast('Already at Beginner.');return;}
+  S.skills[trackId]=lvl-1;ss();
+  showToast('↓ Regressed to '+LEVEL_NAMES[lvl-1]);
+  render();
+}
+
+function finishSession(sesId){
+  const today=new Date();today.setDate(today.getDate()+(S.viewDayOffset||0));
+  const lk2=logKey(sesId,today);
+  if(!S.logs[lk2])S.logs[lk2]={};
+  S.logs[lk2].completed=true;ss();
+  showToast('✓ Session complete!');
+  render();
+}
+
+function pushDay(){
+  S.dayOffset=(S.dayOffset||0)+1;ss();
+  showToast('Schedule pushed +1 day');
+  render();
+}
+
+function confirmReset(){
+  if(confirm('Reset ALL data? This cannot be undone.')){
+    localStorage.removeItem(SK);
+    S={view:'today',dayOffset:0,bw:175,skills:{},logs:{},prs:{},prHistory:[],skillNotes:{},weeklyNotes:{}};
+    Object.keys(SKILLS).forEach(k=>{S.skills[k]=0;});
+    ss();render();
+    showToast('Data reset.');
+  }
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='calisthenics_backup_'+dk()+'.json';a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported!');
+}
+
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      Object.assign(S,d);ss();render();
+      showToast('Imported!');
+    }catch(err){showToast('Import failed.');}
+  };
+  reader.readAsText(file);
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2200);
+}
+
+// ════════════════════════════════════════════════════════════════
+// DAY NAVIGATION
+// ════════════════════════════════════════════════════════════════
+function navDay(dir){
+  const newOff=(S.viewDayOffset||0)+dir;
+  if(newOff>0)return; // can't go to future
+  S.viewDayOffset=newOff;
+  ss();render();
+}
+
+// ════════════════════════════════════════════════════════════════
+// SESSION PREVIEW MODAL
+// ════════════════════════════════════════════════════════════════
+function previewSession(sesId, dayLabel){
+  const ses=SESSIONS[sesId];
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div>
+      <div class="os" style="font-size:18px;font-weight:700;color:${ses.color};">${ses.label}</div>
+      <div style="font-size:12px;color:var(--text3);">${dayLabel} · ${ses.desc}</div>
+    </div>
+    <button onclick="closePreview()" style="background:var(--surface2);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;color:var(--text2);">✕</button>
+  </div>`;
+  ses.blocks.forEach(block=>{
+    h+=`<div style="margin-bottom:12px;">
+      <div class="os" style="font-size:11px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:6px;">${block.title}</div>`;
+    block.exes.forEach(ex=>{
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
+        <div style="width:6px;height:6px;border-radius:50%;background:${ses.color};flex-shrink:0;"></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;">${ex.name}</div>
+          <div style="font-size:11px;color:var(--text3);">${ex.sets} sets · ${ex.reps}</div>
+        </div>
+        ${ex.track?`<span class="badge" style="background:${LEVEL_COLORS[S.skills[ex.track]||0]}22;color:${LEVEL_COLORS[S.skills[ex.track]||0]};font-size:10px;">${LEVEL_NAMES[S.skills[ex.track]||0]}</span>`:''}
+      </div>`;
+    });
+    h+=`</div>`;
+  });
+  h+=`<button class="btn btn-navy" style="width:100%;padding:12px;margin-top:8px;" onclick="closePreview()">CLOSE</button>`;
+
+  // Build modal
+  const overlay=document.createElement('div');
+  overlay.id='preview-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;justify-content:center;z-index:1500;';
+  overlay.innerHTML=`<div style="background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:600px;padding:20px;max-height:85vh;overflow-y:auto;">${h}</div>`;
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closePreview();});
+  document.body.appendChild(overlay);
+}
+
+function closePreview(){
+  const el=document.getElementById('preview-overlay');
+  if(el)el.remove();
+}
+
+// ════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════
+render();
+</script>
+
+<!-- Timer overlay -->
+<div id="timer-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:2000;padding:16px;backdrop-filter:blur(4px);">
+  <div class="timer-box">
+    <div style="display:flex;gap:6px;margin-bottom:18px;background:var(--surface2);border-radius:10px;padding:4px;">
+      <button onclick="timerSetMode('rest')" id="tbtn-rest" class="os" style="flex:1;padding:9px;border:none;border-radius:8px;background:var(--navy);color:#fff;font-size:12px;letter-spacing:1.5px;cursor:pointer;">REST TIMER</button>
+      <button onclick="timerSetMode('hold')" id="tbtn-hold" class="os" style="flex:1;padding:9px;border:none;border-radius:8px;background:transparent;color:var(--text3);font-size:12px;letter-spacing:1.5px;cursor:pointer;">HOLD TIMER</button>
+    </div>
+    <div style="position:relative;width:140px;height:140px;margin:0 auto 16px;">
+      <svg width="140" height="140" style="transform:rotate(-90deg)">
+        <circle cx="70" cy="70" r="56" fill="none" stroke="var(--surface2)" stroke-width="8"/>
+        <circle id="timer-ring" cx="70" cy="70" r="56" fill="none" stroke="var(--navy)" stroke-width="8" stroke-dasharray="351.9" stroke-dashoffset="351.9" style="transition:stroke-dashoffset 0.9s linear;"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div id="timer-display" class="os" style="font-size:44px;color:var(--navy);line-height:1;font-weight:700;">90</div>
+        <div style="font-size:11px;color:var(--text3);">sec</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px;">
+      <button onclick="timerAdjust(-1)" style="width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;color:var(--navy);font-size:18px;cursor:pointer;font-weight:700;">−</button>
+      <span id="timer-target-label" style="color:var(--text2);font-size:13px;min-width:80px;text-align:center;font-weight:500;">90s target</span>
+      <button onclick="timerAdjust(1)" style="width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;color:var(--navy);font-size:18px;cursor:pointer;font-weight:700;">+</button>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px;">
+      <button id="timer-startbtn" onclick="timerStartStop()" class="os btn btn-navy" style="padding:10px 28px;font-size:12px;">START</button>
+      <button onclick="timerReset()" style="padding:10px 16px;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:'Oswald',system-ui;letter-spacing:1.5px;">RESET</button>
+    </div>
+    <div id="timer-done" style="display:none;color:var(--green);font-family:'Oswald',system-ui;letter-spacing:2px;font-size:13px;margin-bottom:8px;font-weight:700;">✓ GO!</div>
+    <div style="display:flex;gap:4px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;">
+      ${[30,45,60,90,120,180].map(s=>`<button onclick="timerPreset(${s})" style="padding:5px 9px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:11px;border-radius:6px;cursor:pointer;font-weight:500;">${s>=60?Math.floor(s/60)+'m'+(s%60?s%60+'s':''):s+'s'}</button>`).join('')}
+    </div>
+    <button onclick="closeTimer()" style="color:var(--text3);font-size:12px;background:none;border:none;cursor:pointer;width:100%;">CLOSE</button>
+  </div>
+</div>
+
+</body>
+</html>
